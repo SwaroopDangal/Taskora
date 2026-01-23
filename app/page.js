@@ -1,4 +1,5 @@
 "use client";
+import connectDB from "@/lib/db";
 import { SignIn, SignedOut, useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 
