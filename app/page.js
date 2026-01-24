@@ -1,4 +1,4 @@
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import {
   ArrowRight,
   CheckCircle2,
@@ -19,7 +19,7 @@ export default async function LandingPage() {
     redirect("/dashboard");
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-100">
       {/* Animated background effect */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 -left-4 w-96 h-96 bg-emerald-400/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
@@ -32,10 +32,10 @@ export default async function LandingPage() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-lg flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 bg-linear-to-br from-emerald-600 to-teal-600 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-2xl font-black text-white">T</span>
               </div>
-              <span className="text-2xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-black bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 Taskora
               </span>
             </div>
@@ -49,12 +49,12 @@ export default async function LandingPage() {
                   Sign In
                 </Button>
               </SignInButton>
-              <SignInButton mode="modal">
-                <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/30">
+              <SignUpButton mode="modal">
+                <Button className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/30">
                   Get Started
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </SignInButton>
+              </SignUpButton>
             </div>
           </div>
         </div>
@@ -71,11 +71,11 @@ export default async function LandingPage() {
           </div>
 
           <h1 className="text-6xl md:text-7xl font-black leading-tight">
-            <span className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent">
               Manage Projects
             </span>
             <br />
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-emerald-600 via-teal-600 to-blue-600 bg-clip-text text-transparent">
               Like Never Before
             </span>
           </h1>
@@ -87,15 +87,15 @@ export default async function LandingPage() {
           </p>
 
           <div className="flex items-center justify-center gap-4 pt-4">
-            <SignInButton mode="modal">
+            <SignUpButton mode="modal">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-lg px-8 py-6 shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
+                className="bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-lg px-8 py-6 shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
               >
                 Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-            </SignInButton>
+            </SignUpButton>
             <SignInButton mode="modal">
               <Button
                 size="lg"
@@ -130,7 +130,7 @@ export default async function LandingPage() {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
               Everything you need to{" "}
-              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 succeed
               </span>
             </h2>
@@ -199,7 +199,7 @@ export default async function LandingPage() {
                 projects efficiently
               </p>
 
-              <SignInButton mode="modal">
+              <SignUpButton mode="modal">
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-lg px-10 py-6 shadow-xl shadow-emerald-500/30"
@@ -207,7 +207,7 @@ export default async function LandingPage() {
                   Get Started for Free
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-              </SignInButton>
+              </SignUpButton>
             </CardContent>
           </Card>
         </div>
