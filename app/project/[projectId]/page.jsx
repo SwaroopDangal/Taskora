@@ -59,174 +59,174 @@ export default function ProjectDetailPage() {
   };
 
   // Mock tasks data (expanded to show pagination)
-  // const tasks = [
-  //   {
-  //     id: 1,
-  //     title: "Design new homepage layout",
-  //     status: "done",
-  //     priority: "high",
-  //     dueDate: "2026-01-20",
-  //     assignee: {
-  //       name: "Sarah Chen",
-  //       avatar: "SC",
-  //     },
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Implement responsive navigation",
-  //     status: "in-progress",
-  //     priority: "high",
-  //     dueDate: "2026-01-25",
-  //     assignee: {
-  //       name: "John Doe",
-  //       avatar: "JD",
-  //     },
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "Optimize images for web",
-  //     status: "todo",
-  //     priority: "medium",
-  //     dueDate: "2026-01-28",
-  //     assignee: {
-  //       name: "Mike Wilson",
-  //       avatar: "MW",
-  //     },
-  //   },
-  //   {
-  //     id: 4,
-  //     title: "Write blog post about redesign",
-  //     status: "todo",
-  //     priority: "low",
-  //     dueDate: "2026-02-05",
-  //     assignee: {
-  //       name: "Emily Davis",
-  //       avatar: "ED",
-  //     },
-  //   },
-  //   {
-  //     id: 5,
-  //     title: "Update contact form validation",
-  //     status: "done",
-  //     priority: "medium",
-  //     dueDate: "2026-01-18",
-  //     assignee: {
-  //       name: "John Doe",
-  //       avatar: "JD",
-  //     },
-  //   },
-  //   {
-  //     id: 6,
-  //     title: "Review accessibility compliance",
-  //     status: "in-progress",
-  //     priority: "high",
-  //     dueDate: "2026-01-22",
-  //     assignee: {
-  //       name: "Sarah Chen",
-  //       avatar: "SC",
-  //     },
-  //   },
-  //   {
-  //     id: 7,
-  //     title: "Set up Google Analytics tracking",
-  //     status: "todo",
-  //     priority: "medium",
-  //     dueDate: "2026-01-30",
-  //     assignee: {
-  //       name: "Mike Wilson",
-  //       avatar: "MW",
-  //     },
-  //   },
-  //   {
-  //     id: 8,
-  //     title: "Create style guide documentation",
-  //     status: "in-progress",
-  //     priority: "low",
-  //     dueDate: "2026-02-02",
-  //     assignee: {
-  //       name: "Emily Davis",
-  //       avatar: "ED",
-  //     },
-  //   },
-  //   {
-  //     id: 9,
-  //     title: "Test cross-browser compatibility",
-  //     status: "todo",
-  //     priority: "high",
-  //     dueDate: "2026-01-27",
-  //     assignee: {
-  //       name: "John Doe",
-  //       avatar: "JD",
-  //     },
-  //   },
-  //   {
-  //     id: 10,
-  //     title: "Implement SEO meta tags",
-  //     status: "done",
-  //     priority: "medium",
-  //     dueDate: "2026-01-19",
-  //     assignee: {
-  //       name: "Sarah Chen",
-  //       avatar: "SC",
-  //     },
-  //   },
-  //   {
-  //     id: 11,
-  //     title: "Configure CDN for static assets",
-  //     status: "in-progress",
-  //     priority: "medium",
-  //     dueDate: "2026-01-26",
-  //     assignee: {
-  //       name: "Mike Wilson",
-  //       avatar: "MW",
-  //     },
-  //   },
-  //   {
-  //     id: 12,
-  //     title: "Design mobile app mockups",
-  //     status: "todo",
-  //     priority: "high",
-  //     dueDate: "2026-02-08",
-  //     assignee: {
-  //       name: "Emily Davis",
-  //       avatar: "ED",
-  //     },
-  //   },
-  //   {
-  //     id: 13,
-  //     title: "Update terms of service page",
-  //     status: "todo",
-  //     priority: "low",
-  //     dueDate: "2026-02-10",
-  //     assignee: {
-  //       name: "John Doe",
-  //       avatar: "JD",
-  //     },
-  //   },
-  //   {
-  //     id: 14,
-  //     title: "Integrate payment gateway",
-  //     status: "in-progress",
-  //     priority: "high",
-  //     dueDate: "2026-01-29",
-  //     assignee: {
-  //       name: "Sarah Chen",
-  //       avatar: "SC",
-  //     },
-  //   },
-  //   {
-  //     id: 15,
-  //     title: "Build email newsletter template",
-  //     status: "done",
-  //     priority: "medium",
-  //     dueDate: "2026-01-21",
-  //     assignee: {
-  //       name: "Mike Wilson",
-  //       avatar: "MW",
-  //     },
-  //   },
-  // ];
-  const tasks=[]
+  const tasks = [
+    {
+      id: 1,
+      title: "Design new homepage layout",
+      status: "done",
+      priority: "high",
+      dueDate: "2026-01-20",
+      assignee: {
+        name: "Sarah Chen",
+        avatar: "SC",
+      },
+    },
+    {
+      id: 2,
+      title: "Implement responsive navigation",
+      status: "in-progress",
+      priority: "high",
+      dueDate: "2026-01-25",
+      assignee: {
+        name: "John Doe",
+        avatar: "JD",
+      },
+    },
+    {
+      id: 3,
+      title: "Optimize images for web",
+      status: "todo",
+      priority: "medium",
+      dueDate: "2026-01-28",
+      assignee: {
+        name: "Mike Wilson",
+        avatar: "MW",
+      },
+    },
+    {
+      id: 4,
+      title: "Write blog post about redesign",
+      status: "todo",
+      priority: "low",
+      dueDate: "2026-02-05",
+      assignee: {
+        name: "Emily Davis",
+        avatar: "ED",
+      },
+    },
+    {
+      id: 5,
+      title: "Update contact form validation",
+      status: "done",
+      priority: "medium",
+      dueDate: "2026-01-18",
+      assignee: {
+        name: "John Doe",
+        avatar: "JD",
+      },
+    },
+    {
+      id: 6,
+      title: "Review accessibility compliance",
+      status: "in-progress",
+      priority: "high",
+      dueDate: "2026-01-22",
+      assignee: {
+        name: "Sarah Chen",
+        avatar: "SC",
+      },
+    },
+    {
+      id: 7,
+      title: "Set up Google Analytics tracking",
+      status: "todo",
+      priority: "medium",
+      dueDate: "2026-01-30",
+      assignee: {
+        name: "Mike Wilson",
+        avatar: "MW",
+      },
+    },
+    {
+      id: 8,
+      title: "Create style guide documentation",
+      status: "in-progress",
+      priority: "low",
+      dueDate: "2026-02-02",
+      assignee: {
+        name: "Emily Davis",
+        avatar: "ED",
+      },
+    },
+    {
+      id: 9,
+      title: "Test cross-browser compatibility",
+      status: "todo",
+      priority: "high",
+      dueDate: "2026-01-27",
+      assignee: {
+        name: "John Doe",
+        avatar: "JD",
+      },
+    },
+    {
+      id: 10,
+      title: "Implement SEO meta tags",
+      status: "done",
+      priority: "medium",
+      dueDate: "2026-01-19",
+      assignee: {
+        name: "Sarah Chen",
+        avatar: "SC",
+      },
+    },
+    {
+      id: 11,
+      title: "Configure CDN for static assets",
+      status: "in-progress",
+      priority: "medium",
+      dueDate: "2026-01-26",
+      assignee: {
+        name: "Mike Wilson",
+        avatar: "MW",
+      },
+    },
+    {
+      id: 12,
+      title: "Design mobile app mockups",
+      status: "todo",
+      priority: "high",
+      dueDate: "2026-02-08",
+      assignee: {
+        name: "Emily Davis",
+        avatar: "ED",
+      },
+    },
+    {
+      id: 13,
+      title: "Update terms of service page",
+      status: "todo",
+      priority: "low",
+      dueDate: "2026-02-10",
+      assignee: {
+        name: "John Doe",
+        avatar: "JD",
+      },
+    },
+    {
+      id: 14,
+      title: "Integrate payment gateway",
+      status: "in-progress",
+      priority: "high",
+      dueDate: "2026-01-29",
+      assignee: {
+        name: "Sarah Chen",
+        avatar: "SC",
+      },
+    },
+    {
+      id: 15,
+      title: "Build email newsletter template",
+      status: "done",
+      priority: "medium",
+      dueDate: "2026-01-21",
+      assignee: {
+        name: "Mike Wilson",
+        avatar: "MW",
+      },
+    },
+  ];
+ 
 
   const hasTasks = tasks.length > 0;
 

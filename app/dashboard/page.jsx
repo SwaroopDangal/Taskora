@@ -122,7 +122,9 @@ export default function Dashboard() {
       <div className="container mx-auto px-6 py-8 max-w-7xl">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-black text-slate-900 mb-2">Dashboard</h1>
+          <h1 className="text-3xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
+            Dashboard
+          </h1>
           <p className="text-slate-600">Overview of your groups</p>
         </div>
 
@@ -218,7 +220,7 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold text-slate-900">My groups</h2>
             <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-md">
               <Users className="h-4 w-4 mr-2" />
-              Create Group group
+              Create Group 
             </Button>
           </div>
 
@@ -282,9 +284,7 @@ export default function Dashboard() {
                                 : "bg-blue-50 text-blue-700 border-blue-200"
                             }
                           >
-                            {group.type === "personal"
-                              ? "Personal"
-                              : "Group"}
+                            {group.type === "personal" ? "Personal" : "Group"}
                           </Badge>
                         </div>
 
@@ -340,8 +340,8 @@ export default function Dashboard() {
                     No groups yet
                   </h3>
                   <p className="text-slate-600 mb-6">
-                    Get started by creating a group group and invite your
-                    team members to collaborate
+                    Get started by creating a group group and invite your team
+                    members to collaborate
                   </p>
                   <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-base px-6 py-6 shadow-lg">
                     <Users className="h-5 w-5 mr-2" />

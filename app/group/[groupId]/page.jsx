@@ -24,8 +24,10 @@ import {
   Copy,
   Check,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const TaskoraGroupPage = () => {
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState("overview");
   const [viewMode, setViewMode] = useState("list");
   const [searchQuery, setSearchQuery] = useState("");
@@ -286,7 +288,7 @@ const TaskoraGroupPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
             <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-sm flex-shrink-0">
+              <div className="w-12 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-sm flex-shrink-0">
                 {groupData.logo}
               </div>
               <div className="flex-1 min-w-0">
@@ -313,7 +315,7 @@ const TaskoraGroupPage = () => {
                 <UserPlus className="w-4 h-4" />
                 Invite Member
               </button>
-              <button className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium text-sm shadow-sm">
+              <button className="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white hover:bg-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium text-sm shadow-sm">
                 <Plus className="w-4 h-4" />
                 <span className="sm:inline">Create Project</span>
               </button>
@@ -329,12 +331,12 @@ const TaskoraGroupPage = () => {
 
         {/* Navigation */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex gap-4 sm:gap-6 border-b border-gray-200 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-4 sm:gap-6 border-b border-gray-200 overflow-x-auto scrollbar-hid">
             <button
               onClick={() => setActiveSection("overview")}
               className={`px-1 py-3 font-medium text-sm whitespace-nowrap border-b-2 -mb-px transition-colors ${
                 activeSection === "overview"
-                  ? "border-indigo-600 text-indigo-600"
+                  ? "border-emerald-600 text-emerald-600"
                   : "border-transparent text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -344,7 +346,7 @@ const TaskoraGroupPage = () => {
               onClick={() => setActiveSection("members")}
               className={`px-1 py-3 font-medium text-sm whitespace-nowrap border-b-2 -mb-px transition-colors ${
                 activeSection === "members"
-                  ? "border-indigo-600 text-indigo-600"
+                  ? "border-emerald-600 text-emerald-600"
                   : "border-transparent text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -354,7 +356,7 @@ const TaskoraGroupPage = () => {
               onClick={() => setActiveSection("settings")}
               className={`px-1 py-3 font-medium text-sm whitespace-nowrap border-b-2 -mb-px transition-colors ${
                 activeSection === "settings"
-                  ? "border-indigo-600 text-indigo-600"
+                  ? "border-emerald-600 text-emerald-600"
                   : "border-transparent text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -576,7 +578,12 @@ const TaskoraGroupPage = () => {
                             </div>
                           </div>
 
-                          <button className="ml-6 px-4 py-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium opacity-0 group-hover:opacity-100">
+                          <button
+                            className="ml-6 px-4 py-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium opacity-0 group-hover:opacity-100"
+                            onClick={() =>
+                              router.push(`/project/${project.id}`)
+                            }
+                          >
                             Open
                             <ArrowUpRight className="w-4 h-4" />
                           </button>
