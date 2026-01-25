@@ -12,6 +12,7 @@ import {
   FolderOpen,
   Users,
   User,
+  Building2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,58 +54,68 @@ export default function Dashboard() {
       bgColor: "bg-amber-50",
     },
     {
-      title: "Active Projects",
+      title: "Active groups",
       value: 5,
-      icon: Briefcase,
+      icon: Building2,
       color: "text-emerald-600",
       bgColor: "bg-emerald-50",
     },
   ];
 
-  const projects = [
+  const groups = [
     {
-      id: 1,
-      name: "Website Redesign",
-      type: "group",
-      taskCount: 24,
-      completedTasks: 18,
-      progress: 75,
+      id: "personal",
+      name: "Personal group",
+      type: "personal",
+      members: 1,
+      projectCount: 3,
+      taskCount: 18,
+      completedTasks: 10,
+      progress: 56,
     },
     {
       id: 2,
-      name: "Mobile App Development",
+      name: "Engineering Team",
       type: "group",
-      taskCount: 45,
-      completedTasks: 12,
-      progress: 27,
+      members: 8,
+      projectCount: 5,
+      taskCount: 67,
+      completedTasks: 45,
+      progress: 67,
     },
     {
       id: 3,
-      name: "Personal Goals 2026",
-      type: "personal",
-      taskCount: 10,
-      completedTasks: 7,
-      progress: 70,
+      name: "Marketing Department",
+      type: "group",
+      members: 5,
+      projectCount: 4,
+      taskCount: 32,
+      completedTasks: 28,
+      progress: 88,
     },
     {
       id: 4,
-      name: "Marketing Campaign Q1",
+      name: "Design Team",
       type: "group",
-      taskCount: 18,
-      completedTasks: 15,
-      progress: 83,
+      members: 4,
+      projectCount: 3,
+      taskCount: 24,
+      completedTasks: 12,
+      progress: 50,
     },
     {
       id: 5,
-      name: "Learning React & Next.js",
-      type: "personal",
-      taskCount: 8,
-      completedTasks: 3,
-      progress: 38,
+      name: "Product Management",
+      type: "group",
+      members: 6,
+      projectCount: 6,
+      taskCount: 41,
+      completedTasks: 35,
+      progress: 85,
     },
   ];
 
-  const hasProjects = projects.length > 0;
+  const hasgroups = groups.length > 0;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -112,7 +123,7 @@ export default function Dashboard() {
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-black text-slate-900 mb-2">Dashboard</h1>
-          <p className="text-slate-600">Overview of your work</p>
+          <p className="text-slate-600">Overview of your groups</p>
         </div>
 
         {/* Global Stats Section */}
@@ -146,7 +157,7 @@ export default function Dashboard() {
           })}
         </div>
 
-        {/* Task Controls Section */}
+        {/* group Controls Section */}
         <div className="flex items-center gap-3 mb-6">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -160,16 +171,16 @@ export default function Dashboard() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem onClick={() => setFilterBy("All")}>
-                All Projects
+                All groups
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setFilterBy("Personal")}>
                 Personal Only
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterBy("Group")}>
-                Group Only
+              <DropdownMenuItem onClick={() => setFilterBy("Groups")}>
+                Groups Only
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setFilterBy("Active")}>
-                Active Projects
+                Active groups
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -185,95 +196,130 @@ export default function Dashboard() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuItem onClick={() => setSortBy("Due Date")}>
-                Due Date
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy("Priority")}>
-                Priority
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setSortBy("Recently Updated")}>
                 Recently Updated
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setSortBy("Name")}>
                 Name
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("Progress")}>
+                Progress
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("Members")}>
+                Members
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
-        {/* Projects List Section */}
+        {/* groups List Section */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-slate-900">Projects</h2>
+            <h2 className="text-2xl font-bold text-slate-900">My groups</h2>
             <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-md">
-              <Briefcase className="h-4 w-4 mr-2" />
-              New Project
+              <Users className="h-4 w-4 mr-2" />
+              Create Group group
             </Button>
           </div>
 
-          {hasProjects ? (
+          {hasgroups ? (
             <div className="grid grid-cols-1 gap-4">
-              {projects.map((project) => (
+              {groups.map((group) => (
                 <Card
-                  key={project.id}
+                  key={group.id}
                   className="border-slate-200 hover:shadow-lg hover:border-emerald-200 transition-all cursor-pointer group"
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between gap-6">
-                      {/* Project Info */}
+                      {/* group Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-3">
-                          <h3 className="text-lg font-bold text-slate-900 truncate">
-                            {project.name}
-                          </h3>
+                          <div
+                            className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                              group.type === "personal"
+                                ? "bg-emerald-100"
+                                : "bg-blue-100"
+                            }`}
+                          >
+                            {group.type === "personal" ? (
+                              <User
+                                className={`h-5 w-5 ${
+                                  group.type === "personal"
+                                    ? "text-emerald-600"
+                                    : "text-blue-600"
+                                }`}
+                              />
+                            ) : (
+                              <Users
+                                className={`h-5 w-5 ${
+                                  group.type === "personal"
+                                    ? "text-emerald-600"
+                                    : "text-blue-600"
+                                }`}
+                              />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-bold text-slate-900 truncate">
+                              {group.name}
+                            </h3>
+                            <p className="text-sm text-slate-500">
+                              {group.projectCount}{" "}
+                              {group.projectCount === 1
+                                ? "project"
+                                : "projects"}{" "}
+                              •{" "}
+                              {group.type === "personal"
+                                ? "Private"
+                                : `${group.members} members`}
+                            </p>
+                          </div>
                           <Badge
                             variant="secondary"
                             className={
-                              project.type === "personal"
+                              group.type === "personal"
                                 ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                                 : "bg-blue-50 text-blue-700 border-blue-200"
                             }
                           >
-                            {project.type === "personal" ? (
-                              <>
-                                <User className="h-3 w-3 mr-1" />
-                                Personal
-                              </>
-                            ) : (
-                              <>
-                                <Users className="h-3 w-3 mr-1" />
-                                Group
-                              </>
-                            )}
+                            {group.type === "personal"
+                              ? "Personal"
+                              : "Group"}
                           </Badge>
                         </div>
 
                         <div className="flex items-center gap-6 mb-3">
                           <p className="text-sm text-slate-600">
                             <span className="font-semibold text-slate-900">
-                              {project.completedTasks}
+                              {group.completedTasks}
                             </span>
-                            /{project.taskCount} tasks completed
+                            /{group.taskCount} tasks completed
                           </p>
                           <p className="text-sm font-semibold text-emerald-600">
-                            {project.progress}% complete
+                            {group.progress}% complete
                           </p>
                         </div>
 
                         {/* Progress Bar */}
                         <Progress
-                          value={project.progress}
+                          value={group.progress}
                           className="h-2 bg-slate-100"
                         />
                       </div>
 
                       {/* Action Button */}
-                      <Link href={`/dashboard/${project.id}`}>
+                      <Link
+                        href={
+                          group.type === "personal"
+                            ? `/group/personal`
+                            : `/group/${group.id}`
+                        }
+                      >
                         <Button
                           variant="outline"
                           className="border-slate-300 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 font-semibold group-hover:shadow-md transition-all flex-shrink-0"
                         >
-                          Open Project
+                          Open group
                           <ChevronRight className="h-4 w-4 ml-2" />
                         </Button>
                       </Link>
@@ -291,15 +337,15 @@ export default function Dashboard() {
                     <FolderOpen className="h-10 w-10 text-slate-400" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">
-                    You don't have any projects yet
+                    No groups yet
                   </h3>
                   <p className="text-slate-600 mb-6">
-                    Get started by creating your first project and start
-                    organizing your tasks
+                    Get started by creating a group group and invite your
+                    team members to collaborate
                   </p>
                   <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-base px-6 py-6 shadow-lg">
-                    <Briefcase className="h-5 w-5 mr-2" />
-                    Create your first project
+                    <Users className="h-5 w-5 mr-2" />
+                    Create your first group
                   </Button>
                 </div>
               </CardContent>
