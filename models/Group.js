@@ -22,6 +22,10 @@ const groupSchema = new mongoose.Schema(
         ref: "Project",
       },
     ],
+    imageUrl: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );
