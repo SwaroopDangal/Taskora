@@ -25,10 +25,12 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import CreateGroupModal from "@/components/CreateGroupModal";
 
 export default function Dashboard() {
   const [sortBy, setSortBy] = useState("Recently Updated");
   const [filterBy, setFilterBy] = useState("All");
+  const [isOpen, setIsOpen] = useState(false);
 
   // Mock data - replace with actual data from your backend
   const stats = [
@@ -218,9 +220,12 @@ export default function Dashboard() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-slate-900">My groups</h2>
-            <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-md">
+            <Button
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-md"
+              onClick={() => setIsOpen(true)}
+            >
               <Users className="h-4 w-4 mr-2" />
-              Create Group 
+              Create Group
             </Button>
           </div>
 
@@ -353,6 +358,7 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+      {isOpen && <CreateGroupModal isOpen={isOpen} setIsOpen={setIsOpen} />}
     </div>
   );
 }
