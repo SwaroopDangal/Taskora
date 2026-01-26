@@ -6,8 +6,12 @@ import { protectRoute } from "@/lib/protectRoute";
 //NOTE:create group
 export const POST = async (request) => {
   const { user, error } = await protectRoute();
+  console.log("USER", user);
   if (error) return error;
-  const { name, description, imageUrl } = await request.json();
+  const formData = await request.formData();
+  const name = formData.get("name");
+  const description = formData.get("description");
+  const imageUrl = formData.get("imgUrl");
   if (!name)
     return NextResponse.json(
       { message: "Fields are required" },
@@ -15,7 +19,7 @@ export const POST = async (request) => {
     );
   try {
     await connectDB();
-    const group = Group.create({
+    const group = await Group.create({
       name,
       description,
       imageUrl,
