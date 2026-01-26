@@ -226,7 +226,6 @@ export default function ProjectDetailPage() {
       },
     },
   ];
- 
 
   const hasTasks = tasks.length > 0;
 
@@ -677,7 +676,7 @@ export default function ProjectDetailPage() {
                           >
                             {page}
                           </Button>
-                        )
+                        ),
                       )}
                     </div>
 

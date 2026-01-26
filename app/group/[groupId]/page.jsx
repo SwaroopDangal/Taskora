@@ -406,7 +406,7 @@ const TaskoraGroupPage = () => {
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   {Math.round(
-                    (groupData.completedTasks / groupData.totalTasks) * 100
+                    (groupData.completedTasks / groupData.totalTasks) * 100,
                   )}
                   % completion
                 </p>
@@ -556,7 +556,7 @@ const TaskoraGroupPage = () => {
                                   Due{" "}
                                   {new Date(project.dueDate).toLocaleDateString(
                                     "en-US",
-                                    { month: "short", day: "numeric" }
+                                    { month: "short", day: "numeric" },
                                   )}
                                 </span>
                               </div>
@@ -581,7 +581,9 @@ const TaskoraGroupPage = () => {
                           <button
                             className="ml-6 px-4 py-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium opacity-0 group-hover:opacity-100"
                             onClick={() =>
-                              router.push(`/project/${project.id}`)
+                              router.push(
+                                `/group/${groupData.id}/project/${project.id}`,
+                              )
                             }
                           >
                             Open
@@ -657,7 +659,7 @@ const TaskoraGroupPage = () => {
                               Due{" "}
                               {new Date(project.dueDate).toLocaleDateString(
                                 "en-US",
-                                { month: "short", day: "numeric" }
+                                { month: "short", day: "numeric" },
                               )}
                             </span>
                           </div>
