@@ -1,0 +1,52 @@
+import connectDB from "@/lib/db";
+import Group from "@/models/Group";
+import { NextResponse } from "next/server";
+import { protectRoute } from "@/lib/protectRoute";
+
+//NOTE:create group
+export const POST = async (request) => {
+  const { user, error } = await protectRoute();
+  if (error) return error;
+  const { name, description, imageUrl } = await request.json();
+  if (!name)
+    return NextResponse.json(
+      { message: "Fields are required" },
+      { status: 400 }
+    );
+  try {
+    await connectDB();
+    const group = Group.create({
+      name,
+      description,
+      imageUrl,
+      members: [{ user: user._id, role: "admin" }],
+    });
+    return NextResponse.json(group, { status: 201 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      { message: "Error creating group" },
+      { status: 500 }
+    );
+  }
+};
+
+//NOTE:  get all my groups
+
+export const GET = async (request) => {
+  const { user, error } = await protectRoute();
+  if (error) return error;
+  try {
+    await connectDB();
+    const groups = await Group.find({
+      members: { $elemMatch: { user: user._id } },
+    }).populate("members.user");
+    return NextResponse.json(groups, { status: 200 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      { message: "Error fetching groups" },
+      { status: 500 }
+    );
+  }
+};
