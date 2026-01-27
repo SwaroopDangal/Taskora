@@ -25,14 +25,18 @@ import {
   Check,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import CreateProjectModal from "@/components/CreateProjectModal";
 
-const TaskoraGroupPage = () => {
+const TaskoraGroupPage = ({ params }) => {
+  const { groupId } = useParams();
   const router = useRouter();
   const [activeSection, setActiveSection] = useState("overview");
   const [viewMode, setViewMode] = useState("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [copied, setCopied] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Mock Data
   const groupData = {
@@ -315,7 +319,10 @@ const TaskoraGroupPage = () => {
                 <UserPlus className="w-4 h-4" />
                 Invite Member
               </button>
-              <button className="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white hover:bg-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium text-sm shadow-sm">
+              <button
+                className="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white hover:bg-indigo-700 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium text-sm shadow-sm"
+                onClick={() => setIsOpen(true)}
+              >
                 <Plus className="w-4 h-4" />
                 <span className="sm:inline">Create Project</span>
               </button>
@@ -838,6 +845,13 @@ const TaskoraGroupPage = () => {
           </div>
         )}
       </div>
+      {isOpen && (
+        <CreateProjectModal
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          groupId={groupId}
+        />
+      )}
     </div>
   );
 };

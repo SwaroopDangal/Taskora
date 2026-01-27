@@ -27,7 +27,20 @@ export default function RootLayout({ children }) {
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Providers> {children}
-            <Toaster />
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                className: "bg-gradient-to-br from-emerald-600 to-teal-600  text-white",
+                style: {
+                  background: "rgba(0, 0, 0, 0.8)",
+                  color: "white",
+                  borderRadius: "0.5rem",
+                  padding: "0.5rem",
+                  fontSize: "0.875rem",
+                },
+              }}
+
+            />
           </Providers>
         </body>
       </html>
