@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import Task from "@/models/Task";     // ✅ REQUIRED
+import Project from "@/models/Project"; // ✅ also needed if populated
+import User from "@/models/User";     // ✅ because 
 
 const groupSchema = new mongoose.Schema(
   {

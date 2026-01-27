@@ -20,7 +20,6 @@ export default function CreateGroupModal({ isOpen, setIsOpen }) {
   const [groupType, setGroupType] = useState("Public");
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
-  const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { groupCreationMutation, isPending } = useCreateGroup(setIsOpen);
@@ -71,13 +70,12 @@ export default function CreateGroupModal({ isOpen, setIsOpen }) {
 
       if (imageFile) {
         uploadedImageUrl = await uploadImageToCloudinary();
-        setImageUrl(uploadedImageUrl);
       }
 
       const payload = {
         name: groupName,
-        description,
-        imageUrl: uploadedImageUrl,
+        description: description || "",
+        imgUrl: uploadedImageUrl,
         groupType: groupType.toLowerCase(),
       };
 
