@@ -36,13 +36,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import CreateTaskModal from "@/components/CreateTaskModal";
+import { useParams } from "next/navigation";
 
 export default function ProjectDetailPage() {
+  const { groupId, projectId } = useParams();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [filterPriority, setFilterPriority] = useState("All");
   const [sortBy, setSortBy] = useState("Recently updated");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
   const tasksPerPage = 10;
 
   // Mock project data
@@ -362,7 +367,10 @@ export default function ProjectDetailPage() {
                 <LayoutGrid className="h-4 w-4 mr-2" />
                 Open Kanban Board
               </Button>
-              <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-md w-full sm:w-auto">
+              <Button
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-md w-full sm:w-auto"
+                onClick={() => setIsOpen(true)}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Task
               </Button>
@@ -718,6 +726,13 @@ export default function ProjectDetailPage() {
           </Card>
         )}
       </div>
+      {/* Create Task Modal */}
+      <CreateTaskModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        groupId={groupId}
+        projectId={projectId}
+      />
     </div>
   );
 }

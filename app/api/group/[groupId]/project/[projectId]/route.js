@@ -1,6 +1,6 @@
 
 
-import dbConnect from "@/lib/dbConnect";
+import connectDB from "@/lib/db";
 import Task from "@/models/Task";
 import Project from "@/models/Project";
 import Group from "@/models/Group";
@@ -26,8 +26,9 @@ export const POST = async (request, { params }) => {
             { status: 400 }
         );
     try {
-        await dbConnect();
+        await connectDB();
         const group = await Group.findById(groupId);
+        console.log(group)
         if (!group) {
             return NextResponse.json(
                 { message: "Group not found" }, { status: 404 });
@@ -36,6 +37,7 @@ export const POST = async (request, { params }) => {
             _id: projectId,
             group: groupId,
         });
+        console.log(project)
 
         if (!project) {
             return NextResponse.json(
@@ -72,7 +74,7 @@ export const GET = async (request, { params }) => {
     const { user, error } = await protectRoute();
     if (error) return error;
     try {
-        await dbConnect();
+        await connectDB();
         const group = await Group.findById(groupId);
         if (!group) {
             return NextResponse.json(
