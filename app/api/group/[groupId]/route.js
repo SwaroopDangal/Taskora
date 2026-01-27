@@ -2,6 +2,7 @@ import connectDB from "@/lib/db";
 import Project from "@/models/Project";
 import { NextResponse } from "next/server";
 import { protectRoute } from "@/lib/protectRoute";
+import Group from "@/models/Group";
 
 //NOTE:create project inside group
 
@@ -24,7 +25,7 @@ export const POST = async (request, { params }) => {
   try {
 
     await connectDB();
-    const group = await group.findById(groupId);
+    const group = await Group.findById(groupId);
     if (!group) {
       return NextResponse.json(
         { message: "Group not found" }, { status: 404 });
@@ -33,7 +34,7 @@ export const POST = async (request, { params }) => {
       name,
       description,
       dueDate,
-      
+
       priority,
       group: groupId,
       role: [{ user: user._id, role: "creator" }],
@@ -60,7 +61,9 @@ export const GET = async (request, { params }) => {
     await connectDB();
     const projects = await Project.find({
       group: groupId,
-    }).populate("role.user");
+    }).populate("role.user", "_id name email")
+      .populate("group", "_id name description imageUrl groupType")
+      .lean();
     return NextResponse.json(projects, { status: 200 });
   } catch (error) {
     console.log(error);

@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const taskSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -36,11 +38,6 @@ const taskSchema = new mongoose.Schema(
       default: "medium",
     },
 
-    tags: {
-      type: [String],
-      default: [],
-      index: true,
-    },
 
     dueDate: Date,
   },

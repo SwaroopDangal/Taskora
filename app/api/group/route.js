@@ -46,7 +46,7 @@ export const GET = async (request) => {
     await connectDB();
     const groups = await Group.find({
       members: { $elemMatch: { user: user._id } },
-    }).populate("members.user");
+    }).populate("members.user", "_id name email");
     return NextResponse.json(groups, { status: 200 });
   } catch (error) {
     console.log(error);
