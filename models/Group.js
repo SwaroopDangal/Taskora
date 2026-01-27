@@ -26,6 +26,11 @@ const groupSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    groupType: {
+      type: String,
+      enum: ["personal", "public"],
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -17,6 +17,7 @@ import {
 export default function CreateGroupModal({ isOpen, setIsOpen }) {
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
+  const [groupType, setGroupType] = useState("Public");
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
@@ -77,6 +78,7 @@ export default function CreateGroupModal({ isOpen, setIsOpen }) {
         name: groupName,
         description,
         imageUrl: uploadedImageUrl,
+        groupType: groupType.toLowerCase(),
       };
 
       console.log("CREATE GROUP PAYLOAD 👉", payload);
@@ -150,6 +152,17 @@ export default function CreateGroupModal({ isOpen, setIsOpen }) {
               rows={4}
               className="resize-none"
             />
+          </div>
+          <div>
+            <Label>Group Type</Label>
+            <select
+              className="w-full mt-1 p-2 border border-gray-300 rounded-md"
+              value={groupType}
+              onChange={(e) => setGroupType(e.target.value)}
+            >
+              <option>Public</option>
+              <option>Personal</option>
+            </select>
           </div>
 
           {/* Actions */}

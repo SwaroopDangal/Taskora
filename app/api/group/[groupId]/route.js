@@ -12,7 +12,6 @@ export const POST = async (request, { params }) => {
   const {
     name,
     description,
-    projectType = "group",
     dueDate,
     status,
     priority,
@@ -23,17 +22,25 @@ export const POST = async (request, { params }) => {
       { status: 400 }
     );
   try {
+
     await connectDB();
+    const group = await group.findById(groupId);
+    if (!group) {
+      return NextResponse.json(
+        { message: "Group not found" }, { status: 404 });
+    }
     const project = await Project.create({
       name,
       description,
-      projectType,
       dueDate,
-      status,
+      
       priority,
       group: groupId,
       role: [{ user: user._id, role: "creator" }],
     });
+
+    group.projects.push(project._id);
+    await group.save();
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
     console.log(error);

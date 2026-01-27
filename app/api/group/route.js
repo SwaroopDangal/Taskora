@@ -12,6 +12,7 @@ export const POST = async (request) => {
   const name = formData.get("name");
   const description = formData.get("description");
   const imageUrl = formData.get("imgUrl");
+  const groupType = formData.get("groupType");
   if (!name)
     return NextResponse.json(
       { message: "Fields are required" },
@@ -23,6 +24,7 @@ export const POST = async (request) => {
       name,
       description,
       imageUrl,
+      groupType,
       members: [{ user: user._id, role: "admin" }],
     });
     return NextResponse.json(group, { status: 201 });

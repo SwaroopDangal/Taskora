@@ -5,11 +5,7 @@ const projectSchema = new mongoose.Schema(
 
     description: String,
 
-    projectType: {
-      type: String,
-      enum: ["personal", "group"],
-      required: true,
-    },
+
 
     group: {
       type: mongoose.Schema.Types.ObjectId,
