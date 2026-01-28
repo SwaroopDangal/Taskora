@@ -31,6 +31,8 @@ import CreateProjectModal from "@/components/CreateProjectModal";
 import useGetProjects from "@/hooks/useGetProjects";
 import useGetGroupById from "@/hooks/useGetGroupById";
 import Loading from "@/components/Loader";
+import useGetInvitationalLink from "@/hooks/useGetInvitationalLink";
+import InviteModal from "@/components/InviteModal";
 
 const TaskoraGroupPage = () => {
   const { groupId } = useParams();
@@ -41,8 +43,12 @@ const TaskoraGroupPage = () => {
   const [sortBy, setSortBy] = useState("name");
   const [copied, setCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   const { projectsData, isLoading: isProjectLoading } = useGetProjects(groupId);
+  const { invitationLink, isLoading: isInvitationLoading } =
+    useGetInvitationalLink(groupId);
+  console.log(invitationLink?.invitationLink);
 
   const { groupByIdData, isLoading } = useGetGroupById(groupId);
   console.log(groupByIdData);
@@ -82,8 +88,6 @@ const TaskoraGroupPage = () => {
     completedTasks: groupByIdData?.tasks?.filter(
       (task) => task.status === "completed",
     ).length,
-    inviteLink: "",
-    activeMembers: 10,
   };
 
   const members = [
@@ -215,7 +219,7 @@ const TaskoraGroupPage = () => {
     });
 
   const handleCopyInviteLink = () => {
-    navigator.clipboard.writeText(groupData.inviteLink);
+    navigator.clipboard.writeText(invitationLink?.invitationLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -276,7 +280,10 @@ const TaskoraGroupPage = () => {
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <button className="hidden md:flex px-4 py-2.5 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors items-center gap-2 font-medium text-sm">
+              <button
+                className="hidden md:flex px-4 py-2.5 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors items-center gap-2 font-medium text-sm"
+                onClick={() => setIsInviteOpen(true)}
+              >
                 <UserPlus className="w-4 h-4" />
                 Invite Member
               </button>
@@ -764,7 +771,7 @@ const TaskoraGroupPage = () => {
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
-                  value={groupData.inviteLink}
+                  value={invitationLink?.invitationLink || ""}
                   readOnly
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm sm:text-base"
                 />
@@ -785,9 +792,6 @@ const TaskoraGroupPage = () => {
                   )}
                 </button>
               </div>
-              <button className="mt-4 text-sm sm:text-base text-indigo-600 hover:text-indigo-700 font-medium">
-                Generate New Link
-              </button>
             </div>
 
             {/* Danger Zone */}
@@ -813,6 +817,13 @@ const TaskoraGroupPage = () => {
           isOpen={isOpen}
           setIsOpen={setIsOpen}
           groupId={groupId}
+        />
+      )}
+      {isInviteOpen && (
+        <InviteModal
+          isInviteOpen={isInviteOpen}
+          setIsInviteOpen={setIsInviteOpen}
+          inviteLink={invitationLink?.invitationLink || ""}
         />
       )}
     </div>
