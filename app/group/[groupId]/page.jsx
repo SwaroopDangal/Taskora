@@ -30,10 +30,10 @@ import { useParams } from "next/navigation";
 import CreateProjectModal from "@/components/CreateProjectModal";
 import useGetProjects from "@/hooks/useGetProjects";
 import useGetGroupById from "@/hooks/useGetGroupById";
+import Loading from "@/components/Loader";
 
 const TaskoraGroupPage = () => {
   const { groupId } = useParams();
-  console.log(groupId);
   const router = useRouter();
   const [activeSection, setActiveSection] = useState("overview");
   const [viewMode, setViewMode] = useState("list");
@@ -219,6 +219,10 @@ const TaskoraGroupPage = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (isLoading || isProjectLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">

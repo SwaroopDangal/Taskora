@@ -28,6 +28,7 @@ import Link from "next/link";
 import CreateGroupModal from "@/components/CreateGroupModal";
 import useGetGroups from "@/hooks/useGetGroups";
 import Image from "next/image";
+import Loading from "@/components/Loader";
 
 export default function Dashboard() {
   const [sortBy, setSortBy] = useState("Recently Updated");
@@ -86,6 +87,10 @@ export default function Dashboard() {
 
   console.log(groups);
   const hasgroups = groups.length > 0;
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
