@@ -5,9 +5,9 @@ import { NextResponse } from "next/server";
 import { protectRoute } from "@/lib/protectRoute";
 import crypto from "crypto";
 
-export const GET = async (req, res) => {
+export const GET = async (req, { params }) => {
     connectDB();
-    const groupId = await req.params.groupId;
+    const { groupId } = await params;
     const { user, error } = await protectRoute();
     if (error) return error;
     const token = crypto.randomBytes(32).toString("hex");

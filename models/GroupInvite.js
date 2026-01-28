@@ -18,6 +18,5 @@ const groupInviteSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-const GroupInvite = mongoose.model("GroupInvite", groupInviteSchema);
 
-export default GroupInvite;
+export default mongoose.models.GroupInvite || mongoose.model("GroupInvite", groupInviteSchema);
