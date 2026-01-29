@@ -37,6 +37,7 @@ export default function CreateTaskModal({
   const { createTaskMutation, isPending } = useCreateTask({
     setIsOpen,
     groupId: groupId,
+    projectId: projectId,
   });
 
   const handleSubmit = async (e) => {
@@ -54,6 +55,13 @@ export default function CreateTaskModal({
     };
 
     createTaskMutation(payload);
+
+    setName("");
+    setDescription("");
+    setDueDate("");
+    setStatus("");
+    setPriority("");
+    setAssignedTo("");
 
     console.log("CREATE TASK PAYLOAD 👉", payload);
 

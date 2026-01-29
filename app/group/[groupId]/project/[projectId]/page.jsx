@@ -40,6 +40,7 @@ import CreateTaskModal from "@/components/CreateTaskModal";
 import { useParams } from "next/navigation";
 import useGetProjectById from "@/hooks/useGetProjectById";
 import Loading from "@/components/Loader";
+import useGetTask from "@/hooks/useGetTask";
 
 export default function ProjectDetailPage() {
   const { groupId, projectId } = useParams();
@@ -53,6 +54,25 @@ export default function ProjectDetailPage() {
   const tasksPerPage = 10;
 
   const { projectByIdData, isLoading } = useGetProjectById(groupId, projectId);
+  const { taskData, taskLoading } = useGetTask(groupId, projectId);
+  console.log(taskData);
+
+  let tasks = [];
+  taskData?.map((task) => {
+    const payload = {
+      id: task?._id,
+      title: task?.name,
+      status: task?.status,
+      dueDate: task?.dueDate,
+      priority: task?.priority,
+      assignee: {
+        name: task?.assignedTo?.name,
+        avatar: task?.assignedTo?.profileImage,
+      },
+    };
+    tasks.push(payload);
+  });
+
   const project = {
     id: projectByIdData?._id,
     name: projectByIdData?.name,
@@ -62,184 +82,18 @@ export default function ProjectDetailPage() {
     completedTasks: projectByIdData?.tasks?.filter(
       (task) => task.status === "completed",
     ).length,
-    overdueTasks: projectByIdData?.tasks?.filter(
-      (task) => task.dueDate < new Date(),
-    ).length,
-    progress:
+    overdueTasks: projectByIdData?.tasks?.filter((task) => {
+      if (!task.dueDate) return false;
+      return new Date(task.dueDate) < new Date() && task.status !== "completed";
+    }).length,
+
+    progress: Math.round(
       (projectByIdData?.tasks?.filter((task) => task.status === "completed")
         .length /
         (projectByIdData?.tasks?.length || 1)) *
-      100,
+        100,
+    ),
   };
-
-  // Mock tasks data (expanded to show pagination)
-  const tasks = [
-    {
-      id: 1,
-      title: "Design new homepage layout",
-      status: "done",
-      priority: "high",
-      dueDate: "2026-01-20",
-      assignee: {
-        name: "Sarah Chen",
-        avatar: "SC",
-      },
-    },
-    {
-      id: 2,
-      title: "Implement responsive navigation",
-      status: "in-progress",
-      priority: "high",
-      dueDate: "2026-01-25",
-      assignee: {
-        name: "John Doe",
-        avatar: "JD",
-      },
-    },
-    {
-      id: 3,
-      title: "Optimize images for web",
-      status: "todo",
-      priority: "medium",
-      dueDate: "2026-01-28",
-      assignee: {
-        name: "Mike Wilson",
-        avatar: "MW",
-      },
-    },
-    {
-      id: 4,
-      title: "Write blog post about redesign",
-      status: "todo",
-      priority: "low",
-      dueDate: "2026-02-05",
-      assignee: {
-        name: "Emily Davis",
-        avatar: "ED",
-      },
-    },
-    {
-      id: 5,
-      title: "Update contact form validation",
-      status: "done",
-      priority: "medium",
-      dueDate: "2026-01-18",
-      assignee: {
-        name: "John Doe",
-        avatar: "JD",
-      },
-    },
-    {
-      id: 6,
-      title: "Review accessibility compliance",
-      status: "in-progress",
-      priority: "high",
-      dueDate: "2026-01-22",
-      assignee: {
-        name: "Sarah Chen",
-        avatar: "SC",
-      },
-    },
-    {
-      id: 7,
-      title: "Set up Google Analytics tracking",
-      status: "todo",
-      priority: "medium",
-      dueDate: "2026-01-30",
-      assignee: {
-        name: "Mike Wilson",
-        avatar: "MW",
-      },
-    },
-    {
-      id: 8,
-      title: "Create style guide documentation",
-      status: "in-progress",
-      priority: "low",
-      dueDate: "2026-02-02",
-      assignee: {
-        name: "Emily Davis",
-        avatar: "ED",
-      },
-    },
-    {
-      id: 9,
-      title: "Test cross-browser compatibility",
-      status: "todo",
-      priority: "high",
-      dueDate: "2026-01-27",
-      assignee: {
-        name: "John Doe",
-        avatar: "JD",
-      },
-    },
-    {
-      id: 10,
-      title: "Implement SEO meta tags",
-      status: "done",
-      priority: "medium",
-      dueDate: "2026-01-19",
-      assignee: {
-        name: "Sarah Chen",
-        avatar: "SC",
-      },
-    },
-    {
-      id: 11,
-      title: "Configure CDN for static assets",
-      status: "in-progress",
-      priority: "medium",
-      dueDate: "2026-01-26",
-      assignee: {
-        name: "Mike Wilson",
-        avatar: "MW",
-      },
-    },
-    {
-      id: 12,
-      title: "Design mobile app mockups",
-      status: "todo",
-      priority: "high",
-      dueDate: "2026-02-08",
-      assignee: {
-        name: "Emily Davis",
-        avatar: "ED",
-      },
-    },
-    {
-      id: 13,
-      title: "Update terms of service page",
-      status: "todo",
-      priority: "low",
-      dueDate: "2026-02-10",
-      assignee: {
-        name: "John Doe",
-        avatar: "JD",
-      },
-    },
-    {
-      id: 14,
-      title: "Integrate payment gateway",
-      status: "in-progress",
-      priority: "high",
-      dueDate: "2026-01-29",
-      assignee: {
-        name: "Sarah Chen",
-        avatar: "SC",
-      },
-    },
-    {
-      id: 15,
-      title: "Build email newsletter template",
-      status: "done",
-      priority: "medium",
-      dueDate: "2026-01-21",
-      assignee: {
-        name: "Mike Wilson",
-        avatar: "MW",
-      },
-    },
-  ];
 
   const hasTasks = tasks.length > 0;
 
@@ -328,7 +182,7 @@ export default function ProjectDetailPage() {
     );
   };
 
-  if (isLoading) return <Loading />;
+  if (isLoading || taskLoading) return <Loading />;
 
   return (
     <div className="min-h-screen bg-slate-50">

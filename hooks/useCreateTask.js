@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React from 'react'
 import toast from 'react-hot-toast';
 
-const useCreateTask = ({ setIsOpen, groupId }) => {
+const useCreateTask = ({ setIsOpen, groupId, projectId }) => {
     const queryClient = useQueryClient();
     const { mutate: createTaskMutation, isPending } = useMutation({
         mutationFn: createTask,
@@ -17,6 +17,9 @@ const useCreateTask = ({ setIsOpen, groupId }) => {
 
             queryClient.invalidateQueries({
                 queryKey: ["group", groupId],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["tasks", groupId, projectId],
             });
 
             setIsOpen(false);
