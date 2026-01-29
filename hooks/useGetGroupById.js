@@ -4,7 +4,7 @@ import React from 'react'
 
 const useGetGroupById = (groupId) => {
     const { data: groupByIdData, isLoading } = useQuery({
-        queryKey: ["group"],
+        queryKey: ["group", groupId],
         queryFn: () => getGroupById(groupId),
     })
     return ({ groupByIdData, isLoading })

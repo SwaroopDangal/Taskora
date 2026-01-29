@@ -1,5 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React, {
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Users,
   Settings,
@@ -24,6 +30,7 @@ import {
   Copy,
   Check,
   User,
+  Loader,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
@@ -33,6 +40,7 @@ import useGetGroupById from "@/hooks/useGetGroupById";
 import Loading from "@/components/Loader";
 import useGetInvitationalLink from "@/hooks/useGetInvitationalLink";
 import InviteModal from "@/components/InviteModal";
+import useUpdateGroup from "@/hooks/useUpdateGroup";
 
 const TaskoraGroupPage = () => {
   const { groupId } = useParams();
@@ -46,15 +54,18 @@ const TaskoraGroupPage = () => {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   const { projectsData, isLoading: isProjectLoading } = useGetProjects(groupId);
+  const { groupUpdateMutation, updatePending } = useUpdateGroup();
   const { invitationLink, isLoading: isInvitationLoading } =
     useGetInvitationalLink(groupId);
-  console.log(invitationLink?.invitationLink);
 
   const { groupByIdData, isLoading } = useGetGroupById(groupId);
-  console.log(groupByIdData);
+
+  const [edits, setEdits] = useState({});
+
+  const name = edits.name ?? groupByIdData?.name ?? "";
+  const description = edits.description ?? groupByIdData?.description ?? "";
 
   let projects = [];
-
   projectsData?.map((project) => {
     const payload = {
       id: project?._id,
@@ -205,6 +216,17 @@ const TaskoraGroupPage = () => {
     return configs[priority];
   };
 
+  const handleUpdateGroup = async (e) => {
+    e.preventDefault();
+    if (!name) return;
+    const payload = {
+      name: edits.name ?? groupByIdData?.name,
+      description: edits.description ?? groupByIdData?.description,
+      groupId,
+    };
+    groupUpdateMutation(payload);
+  };
+
   const filteredProjects = projects
     .filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
@@ -269,10 +291,12 @@ const TaskoraGroupPage = () => {
                   {groupData.description}
                 </p>
                 <div className="flex items-center gap-3 sm:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-500">
-                  <div className="flex items-center gap-1.5">
-                    <Users className="w-4 h-4" />
-                    <span>{groupData.memberCount} members</span>
-                  </div>
+                  {groupData.groupType !== "personal" && (
+                    <div className="flex items-center gap-1.5">
+                      <Users className="w-4 h-4" />
+                      <span>{groupData.memberCount} members</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-1.5">
                     <FolderKanban className="w-4 h-4" />
                     <span>{groupData.totalProjects} projects</span>
@@ -281,13 +305,15 @@ const TaskoraGroupPage = () => {
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <button
-                className="hidden md:flex px-4 py-2.5 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors items-center gap-2 font-medium text-sm"
-                onClick={() => setIsInviteOpen(true)}
-              >
-                <UserPlus className="w-4 h-4" />
-                Invite Member
-              </button>
+              {groupData.groupType !== "personal" && (
+                <button
+                  className="hidden md:flex px-4 py-2.5 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors items-center gap-2 font-medium text-sm"
+                  onClick={() => setIsInviteOpen(true)}
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Invite Member
+                </button>
+              )}
               <button
                 className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2 font-medium text-sm shadow-sm"
                 onClick={() => setIsOpen(true)}
@@ -318,16 +344,18 @@ const TaskoraGroupPage = () => {
             >
               Overview
             </button>
-            <button
-              onClick={() => setActiveSection("members")}
-              className={`px-1 py-3 sm:py-4 font-medium text-sm whitespace-nowrap border-b-2 -mb-px transition-colors ${
-                activeSection === "members"
-                  ? "border-emerald-600 text-emerald-600"
-                  : "border-transparent text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Members
-            </button>
+            {groupData.groupType !== "personal" && (
+              <button
+                onClick={() => setActiveSection("members")}
+                className={`px-1 py-3 sm:py-4 font-medium text-sm whitespace-nowrap border-b-2 -mb-px transition-colors ${
+                  activeSection === "members"
+                    ? "border-emerald-600 text-emerald-600"
+                    : "border-transparent text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                Members
+              </button>
+            )}
             <button
               onClick={() => setActiveSection("settings")}
               className={`px-1 py-3 sm:py-4 font-medium text-sm whitespace-nowrap border-b-2 -mb-px transition-colors ${
@@ -456,7 +484,10 @@ const TaskoraGroupPage = () => {
                   <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
                     Get started by creating your first project
                   </p>
-                  <button className="px-5 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm sm:text-base">
+                  <button
+                    className="px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg transition-colors font-medium text-sm sm:text-base"
+                    onClick={() => setIsOpen(true)}
+                  >
                     Create Project
                   </button>
                 </div>
@@ -654,8 +685,8 @@ const TaskoraGroupPage = () => {
           </>
         )}
 
-        {/* Members Section */}
-        {activeSection === "members" && (
+        {/* Members Section - Only shown for non-personal groups */}
+        {activeSection === "members" && groupData.groupType !== "personal" && (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
             <div className="p-4 sm:p-5 lg:p-6 border-b border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -739,7 +770,11 @@ const TaskoraGroupPage = () => {
                   </label>
                   <input
                     type="text"
-                    defaultValue={groupData.name}
+                    value={name}
+                    onChange={(e) =>
+                      setEdits((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    required
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm sm:text-base"
                   />
                 </div>
@@ -748,52 +783,76 @@ const TaskoraGroupPage = () => {
                     Description
                   </label>
                   <textarea
-                    defaultValue={groupData.description}
+                    value={description}
+                    onChange={(e) =>
+                      setEdits((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                     rows={4}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm sm:text-base resize-none"
                   />
                 </div>
                 <div className="pt-2">
-                  <button className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm sm:text-base">
-                    Save Changes
+                  <button
+                    disabled={!name || updatePending}
+                    onClick={handleUpdateGroup}
+                    className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3
+             bg-indigo-600 text-white rounded-lg
+             hover:bg-indigo-700 transition-colors
+             font-medium text-sm sm:text-base
+             flex items-center justify-center gap-2
+             disabled:opacity-70"
+                  >
+                    {updatePending ? (
+                      <>
+                        <Loader className="w-5 h-5 animate-spin" />
+                        <span>Updating...</span>
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Invitation Link */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 lg:p-8 shadow-sm">
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">
-                Invitation Link
-              </h3>
-              <p className="text-sm sm:text-base text-gray-600 mb-5 sm:mb-6">
-                Share this link to invite new members to your group
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
-                  value={invitationLink?.invitationLink || ""}
-                  readOnly
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm sm:text-base"
-                />
-                <button
-                  onClick={handleCopyInviteLink}
-                  className="px-5 sm:px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 font-medium whitespace-nowrap text-sm sm:text-base"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 sm:w-5 sm:h-5" />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
-                      Copy Link
-                    </>
-                  )}
-                </button>
+            {/* Invitation Link - Only shown for non-personal groups */}
+            {groupData.groupType !== "personal" && (
+              <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6 lg:p-8 shadow-sm">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">
+                  Invitation Link
+                </h3>
+                <p className="text-sm sm:text-base text-gray-600 mb-5 sm:mb-6">
+                  Share this link to invite new members to your group
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    value={invitationLink?.invitationLink || ""}
+                    readOnly
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm sm:text-base"
+                  />
+                  <button
+                    onClick={handleCopyInviteLink}
+                    className="px-5 sm:px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 font-medium whitespace-nowrap text-sm sm:text-base"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4 sm:w-5 sm:h-5" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 sm:w-5 sm:h-5" />
+                        Copy Link
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Danger Zone */}
             <div className="bg-white rounded-xl border-2 border-red-200 p-5 sm:p-6 lg:p-8 shadow-sm">
@@ -820,7 +879,7 @@ const TaskoraGroupPage = () => {
           groupId={groupId}
         />
       )}
-      {isInviteOpen && (
+      {isInviteOpen && groupData.groupType !== "personal" && (
         <InviteModal
           isInviteOpen={isInviteOpen}
           setIsInviteOpen={setIsInviteOpen}
