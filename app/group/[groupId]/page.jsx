@@ -41,6 +41,9 @@ import Loading from "@/components/Loader";
 import useGetInvitationalLink from "@/hooks/useGetInvitationalLink";
 import InviteModal from "@/components/InviteModal";
 import useUpdateGroup from "@/hooks/useUpdateGroup";
+import useDeleteGroup from "@/hooks/useDeleteGroup";
+import DeleteGroupModal from "@/components/DeleteGroupModal";
+import Image from "next/image";
 
 const TaskoraGroupPage = () => {
   const { groupId } = useParams();
@@ -52,6 +55,7 @@ const TaskoraGroupPage = () => {
   const [copied, setCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false);
 
   const { projectsData, isLoading: isProjectLoading } = useGetProjects(groupId);
   const { groupUpdateMutation, updatePending } = useUpdateGroup();
@@ -87,7 +91,7 @@ const TaskoraGroupPage = () => {
 
     projects.push(payload);
   });
-
+  console.log(projects);
   const groupData = {
     id: groupByIdData?._id,
     name: groupByIdData?.name,
@@ -535,7 +539,13 @@ const TaskoraGroupPage = () => {
                                 <div
                                   className={`w-7 h-7 rounded-full bg-gradient-to-br ${project.lead.color} flex items-center justify-center text-white text-xs font-medium`}
                                 >
-                                  {project.lead.avatar}
+                                  <Image
+                                    src={project.lead.avatar}
+                                    alt={project.lead.name}
+                                    width={40}
+                                    height={40}
+                                    className="rounded-full"
+                                  />
                                 </div>
                                 <span className="text-sm text-gray-600">
                                   {project.lead.name}
@@ -864,7 +874,10 @@ const TaskoraGroupPage = () => {
                 Once you delete this group, all projects and data will be
                 permanently removed. This action cannot be undone.
               </p>
-              <button className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 font-medium text-sm sm:text-base">
+              <button
+                className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 font-medium text-sm sm:text-base"
+                onClick={() => setShowDeleteGroupModal(true)}
+              >
                 <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 Delete Group
               </button>
@@ -884,6 +897,12 @@ const TaskoraGroupPage = () => {
           isInviteOpen={isInviteOpen}
           setIsInviteOpen={setIsInviteOpen}
           inviteLink={invitationLink?.invitationLink || ""}
+        />
+      )}
+      {showDeleteGroupModal && (
+        <DeleteGroupModal
+          setShowDeleteGroupModal={setShowDeleteGroupModal}
+          groupId={groupId}
         />
       )}
     </div>

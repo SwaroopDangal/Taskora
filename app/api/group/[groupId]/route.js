@@ -2,6 +2,7 @@ import connectDB from "@/lib/db";
 import { protectRoute } from "@/lib/protectRoute";
 import Group from "@/models/Group";
 import Project from "@/models/Project";
+import Task from "@/models/Task";
 import { NextResponse } from "next/server";
 
 
@@ -80,7 +81,7 @@ export const DELETE = async (request, { params }) => {
     await Project.deleteMany({ group: groupId })
     await Task.deleteMany({ group: groupId })
     const deletedGroup = await Group.findByIdAndDelete(groupId);
-    return NextResponse.json(deletedGroup, { status: 200 });
+    return NextResponse.json(deletedGroup, { status: 200 }, { message: "Group deleted successfully" });
   } catch (error) {
     console.log(error);
     return NextResponse.json(
