@@ -69,8 +69,9 @@ const TaskoraGroupPage = () => {
         avatar: project?.role.map((role) => role?.user?.profileImage)[0],
         color: "from-blue-500 to-cyan-500",
       },
-      completedTasks: project?.tasks?.filter((task) => task.status === "done")
-        .length,
+      completedTasks: project?.tasks?.filter(
+        (task) => task.status === "completed",
+      ).length,
     };
 
     projects.push(payload);

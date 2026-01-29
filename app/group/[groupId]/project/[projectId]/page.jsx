@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/table";
 import CreateTaskModal from "@/components/CreateTaskModal";
 import { useParams } from "next/navigation";
+import useGetProjectById from "@/hooks/useGetProjectById";
+import Loading from "@/components/Loader";
 
 export default function ProjectDetailPage() {
   const { groupId, projectId } = useParams();
@@ -50,17 +52,24 @@ export default function ProjectDetailPage() {
   const [isOpen, setIsOpen] = useState(false);
   const tasksPerPage = 10;
 
-  // Mock project data
+  const { projectByIdData, isLoading } = useGetProjectById(groupId, projectId);
   const project = {
-    id: "proj-123",
-    name: "Website Redesign",
-    type: "group", // or "personal"
-    description:
-      "Complete overhaul of the company website with modern design and improved UX",
-    totalTasks: 24,
-    completedTasks: 18,
-    overdueTasks: 2,
-    progress: 75,
+    id: projectByIdData?._id,
+    name: projectByIdData?.name,
+    type: projectByIdData?.type,
+    description: projectByIdData?.description,
+    totalTasks: projectByIdData?.tasks?.length,
+    completedTasks: projectByIdData?.tasks?.filter(
+      (task) => task.status === "completed",
+    ).length,
+    overdueTasks: projectByIdData?.tasks?.filter(
+      (task) => task.dueDate < new Date(),
+    ).length,
+    progress:
+      (projectByIdData?.tasks?.filter((task) => task.status === "completed")
+        .length /
+        (projectByIdData?.tasks?.length || 1)) *
+      100,
   };
 
   // Mock tasks data (expanded to show pagination)
@@ -319,6 +328,8 @@ export default function ProjectDetailPage() {
     );
   };
 
+  if (isLoading) return <Loading />;
+
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
@@ -330,26 +341,6 @@ export default function ProjectDetailPage() {
                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
                   {project.name}
                 </h1>
-                <Badge
-                  variant="secondary"
-                  className={
-                    project.type === "personal"
-                      ? "bg-emerald-50 text-emerald-700 border-emerald-200 w-fit"
-                      : "bg-blue-50 text-blue-700 border-blue-200 w-fit"
-                  }
-                >
-                  {project.type === "personal" ? (
-                    <>
-                      <User className="h-3 w-3 mr-1" />
-                      Personal
-                    </>
-                  ) : (
-                    <>
-                      <Users className="h-3 w-3 mr-1" />
-                      Group
-                    </>
-                  )}
-                </Badge>
               </div>
               {project.description && (
                 <p className="text-sm sm:text-base text-slate-600 max-w-3xl">
