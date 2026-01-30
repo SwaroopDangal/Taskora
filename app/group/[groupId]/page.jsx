@@ -1,11 +1,5 @@
 "use client";
-import React, {
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useState } from "react";
 import {
   Users,
   Settings,
@@ -91,7 +85,6 @@ const TaskoraGroupPage = () => {
 
     projects.push(payload);
   });
-  console.log(projects);
   const groupData = {
     id: groupByIdData?._id,
     name: groupByIdData?.name,
@@ -106,80 +99,18 @@ const TaskoraGroupPage = () => {
     ).length,
   };
 
-  const members = [
-    {
-      id: 1,
-      name: "Sarah Chen",
-      avatar: "SC",
-      role: "owner",
-      email: "sarah@acme.co",
-      taskCount: 28,
-      color: "from-blue-500 to-cyan-500",
-    },
-    {
-      id: 2,
-      name: "Mike Johnson",
-      avatar: "MJ",
-      role: "admin",
-      email: "mike@acme.co",
-      taskCount: 24,
-      color: "from-purple-500 to-pink-500",
-    },
-    {
-      id: 3,
-      name: "Alex Kumar",
-      avatar: "AK",
-      role: "admin",
-      email: "alex@acme.co",
-      taskCount: 22,
-      color: "from-green-500 to-emerald-500",
-    },
-    {
-      id: 4,
-      name: "Emma Davis",
-      avatar: "ED",
-      role: "member",
-      email: "emma@acme.co",
-      taskCount: 18,
-      color: "from-orange-500 to-red-500",
-    },
-    {
-      id: 5,
-      name: "James Wilson",
-      avatar: "JW",
-      role: "member",
-      email: "james@acme.co",
-      taskCount: 16,
-      color: "from-teal-500 to-cyan-500",
-    },
-    {
-      id: 6,
-      name: "Lisa Anderson",
-      avatar: "LA",
-      role: "member",
-      email: "lisa@acme.co",
-      taskCount: 14,
-      color: "from-indigo-500 to-purple-500",
-    },
-    {
-      id: 7,
-      name: "Tom Brown",
-      avatar: "TB",
-      role: "member",
-      email: "tom@acme.co",
-      taskCount: 12,
-      color: "from-yellow-500 to-orange-500",
-    },
-    {
-      id: 8,
-      name: "Kate Miller",
-      avatar: "KM",
-      role: "member",
-      email: "kate@acme.co",
+  const members = groupByIdData?.members?.map((member) => {
+    console.log(member);
+    const payload = {
+      id: member?._id,
+      name: member?.user?.name,
+      avatar: member?.user?.profileImage,
+      role: member?.role,
+      email: member?.user?.email,
       taskCount: 10,
-      color: "from-pink-500 to-rose-500",
-    },
-  ];
+    };
+    return payload;
+  });
 
   const getStatusConfig = (status) => {
     const configs = {
@@ -718,9 +649,15 @@ const TaskoraGroupPage = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                       <div
-                        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br ${member.color} flex items-center justify-center text-white font-medium text-base flex-shrink-0`}
+                        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br  flex items-center justify-center text-white font-medium text-base flex-shrink-0`}
                       >
-                        {member.avatar}
+                        <Image
+                          src={member.avatar}
+                          alt={member.name}
+                          width={40}
+                          height={40}
+                          className="rounded-full"
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-base sm:text-lg text-gray-900 truncate">

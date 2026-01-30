@@ -16,7 +16,7 @@ export const GET = async (request, { params }) => {
     await connectDB();
     const group = await Group.findById(groupId)
       .populate("projects", "_id name description status dueDate priority")
-      .populate("members", "_id name email profileImage")
+      .populate("members.user", "_id name email profileImage")
       .populate("tasks", "_id name description status dueDate priority");
     if (!group) {
       return NextResponse.json(

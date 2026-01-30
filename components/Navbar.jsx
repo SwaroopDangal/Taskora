@@ -1,8 +1,11 @@
 "use client";
 
 import { UserButton } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const router = useRouter();
+
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white">
       <div className="px-4 sm:px-6 py-3">
