@@ -50,7 +50,7 @@ export const POST = async (request, { params }) => {
             dueDate,
             status,
             priority,
-            assignedTo: assignedTo || [],
+            assignedTo,
         });
         project.tasks.push(task._id);
         await project.save();
