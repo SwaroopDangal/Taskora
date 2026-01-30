@@ -26,8 +26,8 @@ export const GET = async (request, { params }) => {
         const tasks = await Task.find({
             project: projectId,
             group: groupId,
-        }).populate("assignedTo", "_id name email")
-            .populate("createdBy", "_id name email")
+        }).populate("assignedTo", "_id name email profileImage")
+            .populate("createdBy", "_id name email profileImage")
             .lean();
 
         return NextResponse.json(tasks, { status: 200 });
