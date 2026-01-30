@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import {
-  Users,
-  User,
+  Circle,
+  Menu,
   Plus,
   LayoutGrid,
   CheckCircle2,
@@ -17,6 +17,7 @@ import {
   Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,27 +52,30 @@ export default function ProjectDetailPage() {
   const [sortBy, setSortBy] = useState("Recently updated");
   const [currentPage, setCurrentPage] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
+  const [hoveredRow, setHoveredRow] = useState(null);
   const tasksPerPage = 10;
 
   const { projectByIdData, isLoading } = useGetProjectById(groupId, projectId);
   const { taskData, taskLoading } = useGetTask(groupId, projectId);
-  console.log(taskData);
 
   let tasks = [];
   taskData?.map((task) => {
+    const assignedTo = task.assignedTo.map((member) => ({
+      name: member.name,
+      avatar: member.profileImage,
+    }));
     const payload = {
       id: task?._id,
+      description: task?.description,
       title: task?.name,
       status: task?.status,
       dueDate: task?.dueDate,
       priority: task?.priority,
-      assignee: {
-        name: task?.assignedTo?.name,
-        avatar: task?.assignedTo?.profileImage,
-      },
+      assignedTo,
     };
     tasks.push(payload);
   });
+  console.log(tasks);
 
   const project = {
     id: projectByIdData?._id,
@@ -112,74 +116,85 @@ export default function ProjectDetailPage() {
   };
 
   // Helper function to get status badge
-  const getStatusBadge = (status) => {
-    const statusConfig = {
+  const getStatusConfig = (status) => {
+    const configs = {
       todo: {
+        icon: Circle,
         label: "To Do",
-        className: "bg-slate-100 text-slate-700 border-slate-200",
+        bgColor: "bg-slate-100",
+        textColor: "text-slate-700",
+        dotColor: "bg-slate-400",
       },
       "in-progress": {
+        icon: Clock,
         label: "In Progress",
-        className: "bg-blue-50 text-blue-700 border-blue-200",
+        bgColor: "bg-teal-50",
+        textColor: "text-teal-700",
+        dotColor: "bg-teal-500",
       },
-      done: {
-        label: "Done",
-        className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      completed: {
+        icon: CheckCircle2,
+        label: "Completed",
+        bgColor: "bg-emerald-50",
+        textColor: "text-emerald-700",
+        dotColor: "bg-emerald-500",
       },
     };
-
-    const config = statusConfig[status] || statusConfig.todo;
-    return (
-      <Badge variant="outline" className={config.className}>
-        {config.label}
-      </Badge>
-    );
+    return configs[status] || configs.todo;
   };
 
   // Helper function to get priority badge
-  const getPriorityBadge = (priority) => {
-    const priorityConfig = {
+
+  const getPriorityConfig = (priority) => {
+    const configs = {
       low: {
         label: "Low",
-        className: "bg-slate-100 text-slate-600 border-slate-200",
+        bgColor: "bg-slate-100",
+        textColor: "text-slate-600",
+        borderColor: "border-slate-300",
       },
       medium: {
         label: "Medium",
-        className: "bg-amber-50 text-amber-700 border-amber-200",
+        bgColor: "bg-amber-50",
+        textColor: "text-amber-700",
+        borderColor: "border-amber-300",
       },
       high: {
         label: "High",
-        className: "bg-red-50 text-red-700 border-red-200",
+        bgColor: "bg-rose-50",
+        textColor: "text-rose-700",
+        borderColor: "border-rose-300",
       },
     };
-
-    const config = priorityConfig[priority] || priorityConfig.low;
-    return (
-      <Badge variant="outline" className={config.className}>
-        {config.label}
-      </Badge>
-    );
+    return configs[priority] || configs.medium;
   };
 
   // Helper function to format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const today = new Date();
-    const isOverdue =
-      date < today && date.toDateString() !== today.toDateString();
+    const diffTime = date - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     const formatted = date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
+      year: date.getFullYear() !== today.getFullYear() ? "numeric" : undefined,
     });
 
-    return (
-      <span
-        className={isOverdue ? "text-red-600 font-medium" : "text-slate-600"}
-      >
-        {formatted}
-      </span>
-    );
+    if (diffDays < 0)
+      return {
+        text: formatted,
+        overdue: true,
+        daysText: `${Math.abs(diffDays)}d overdue`,
+      };
+    if (diffDays === 0)
+      return { text: "Today", urgent: true, daysText: "Due today" };
+    if (diffDays === 1)
+      return { text: "Tomorrow", urgent: true, daysText: "Due tomorrow" };
+    if (diffDays <= 7)
+      return { text: formatted, soon: true, daysText: `${diffDays}d left` };
+    return { text: formatted, daysText: `${diffDays}d left` };
   };
 
   if (isLoading || taskLoading) return <Loading />;
@@ -399,84 +414,308 @@ export default function ProjectDetailPage() {
         {/* Task List */}
         {hasTasks ? (
           <Card className="border-slate-200">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent border-slate-200">
-                    <TableHead className="font-semibold text-slate-700 min-w-[200px]">
-                      Task
-                    </TableHead>
-                    <TableHead className="font-semibold text-slate-700 min-w-[120px]">
-                      Status
-                    </TableHead>
-                    <TableHead className="font-semibold text-slate-700 min-w-[100px]">
-                      Priority
-                    </TableHead>
-                    <TableHead className="font-semibold text-slate-700 min-w-[120px]">
-                      Due Date
-                    </TableHead>
-                    {project.type === "group" && (
-                      <TableHead className="font-semibold text-slate-700 min-w-[150px]">
-                        Assignee
-                      </TableHead>
-                    )}
-                    <TableHead className="w-[50px]"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {currentTasks.map((task) => (
-                    <TableRow
-                      key={task.id}
-                      className="cursor-pointer hover:bg-slate-50 border-slate-200"
-                    >
-                      <TableCell className="font-medium text-slate-900">
-                        {task.title}
-                      </TableCell>
-                      <TableCell>{getStatusBadge(task.status)}</TableCell>
-                      <TableCell>{getPriorityBadge(task.priority)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <CalendarIcon className="h-4 w-4 text-slate-400 flex-shrink-0" />
-                          {formatDate(task.dueDate)}
-                        </div>
-                      </TableCell>
-                      {project.type === "group" && (
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                              {task.assignee.avatar}
+            {/* Desktop Table View - Hidden on mobile */}
+            <div className="hidden lg:block bg-white rounded-2xl shadow-lg border border-emerald-100 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">
+                        Task
+                      </th>
+                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">
+                        Status
+                      </th>
+                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">
+                        Priority
+                      </th>
+                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">
+                        Due Date
+                      </th>
+                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">
+                        Assigned To
+                      </th>
+                      <th className="w-12"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tasks.map((task, index) => {
+                      const statusConfig = getStatusConfig(task.status);
+                      const priorityConfig = getPriorityConfig(task.priority);
+                      const dateInfo = formatDate(task.dueDate);
+                      const StatusIcon = statusConfig.icon;
+
+                      return (
+                        <tr
+                          key={task.id}
+                          className={`border-b border-slate-100 transition-all duration-200 ${
+                            hoveredRow === task.id
+                              ? "bg-gradient-to-r from-emerald-50 to-transparent shadow-sm"
+                              : "hover:bg-slate-50"
+                          }`}
+                          onMouseEnter={() => setHoveredRow(task.id)}
+                          onMouseLeave={() => setHoveredRow(null)}
+                        >
+                          {/* Task Title */}
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`w-1 h-10 rounded-full ${priorityConfig.bgColor} ${priorityConfig.borderColor} border-2`}
+                              ></div>
+                              <div>
+                                <p className="font-medium text-slate-900 mb-0.5">
+                                  {task.title}
+                                </p>
+                                <p className="text-xs text-slate-500">
+                                  {task.description}
+                                </p>
+                              </div>
                             </div>
-                            <span className="text-sm text-slate-700 truncate">
-                              {task.assignee.name}
-                            </span>
-                          </div>
-                        </TableCell>
-                      )}
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-4 px-6">
+                            <div
+                              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full ${statusConfig.bgColor}`}
                             >
-                              <MoreHorizontal className="h-4 w-4 text-slate-500" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit task</DropdownMenuItem>
-                            <DropdownMenuItem>Change status</DropdownMenuItem>
-                            <DropdownMenuItem>Set priority</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
-                              Delete task
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                              <StatusIcon
+                                className={`w-4 h-4 ${statusConfig.textColor}`}
+                              />
+                              <span
+                                className={`text-sm font-medium ${statusConfig.textColor}`}
+                              >
+                                {statusConfig.label}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Priority */}
+                          <td className="py-4 px-6">
+                            <div
+                              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border ${priorityConfig.bgColor} ${priorityConfig.textColor} ${priorityConfig.borderColor}`}
+                            >
+                              <div
+                                className={`w-2 h-2 rounded-full ${priorityConfig.textColor.replace("text-", "bg-")}`}
+                              ></div>
+                              <span className="text-sm font-medium">
+                                {priorityConfig.label}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Due Date */}
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-2">
+                              <Calendar
+                                className={`w-4 h-4 flex-shrink-0 ${
+                                  dateInfo.overdue
+                                    ? "text-rose-500"
+                                    : dateInfo.urgent
+                                      ? "text-amber-500"
+                                      : dateInfo.soon
+                                        ? "text-teal-500"
+                                        : "text-slate-400"
+                                }`}
+                              />
+                              <div>
+                                <p
+                                  className={`text-sm font-medium ${
+                                    dateInfo.overdue
+                                      ? "text-rose-700"
+                                      : dateInfo.urgent
+                                        ? "text-amber-700"
+                                        : "text-slate-700"
+                                  }`}
+                                >
+                                  {dateInfo.text}
+                                </p>
+                                <p
+                                  className={`text-xs ${
+                                    dateInfo.overdue
+                                      ? "text-rose-600"
+                                      : dateInfo.urgent
+                                        ? "text-amber-600"
+                                        : "text-slate-500"
+                                  }`}
+                                >
+                                  {dateInfo.daysText}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Assigned To */}
+                          <td className="py-4 px-6">
+                            <div className="flex items-center -space-x-2">
+                              {task.assignedTo.map((member, i) => (
+                                <div
+                                  key={i}
+                                  className="relative group"
+                                  style={{ zIndex: task.assignedTo.length - i }}
+                                >
+                                  <div className="w-9 h-9 rounded-full border-2 border-white bg-gradient-to-br from-emerald-400 to-teal-500 overflow-hidden shadow-md hover:scale-110 transition-transform cursor-pointer">
+                                    <img
+                                      src={member.avatar}
+                                      alt={member.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  {/* Tooltip */}
+                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
+                                    {member.name}
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 bg-slate-900 rotate-45"></div>
+                                  </div>
+                                </div>
+                              ))}
+                              {task.assignedTo.length > 3 && (
+                                <div className="w-9 h-9 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-xs font-semibold text-slate-600 shadow-md">
+                                  +{task.assignedTo.length - 3}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-4 px-6">
+                            <button className="w-8 h-8 rounded-lg hover:bg-emerald-50 flex items-center justify-center transition-colors group">
+                              <MoreHorizontal className="w-5 h-5 text-slate-400 group-hover:text-emerald-600" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Card View - Shown on small/medium screens */}
+            <div className="lg:hidden space-y-4">
+              {tasks.map((task) => {
+                const statusConfig = getStatusConfig(task.status);
+                const priorityConfig = getPriorityConfig(task.priority);
+                const dateInfo = formatDate(task.dueDate);
+                const StatusIcon = statusConfig.icon;
+
+                return (
+                  <div
+                    key={task.id}
+                    className="bg-white rounded-xl shadow-md border border-emerald-100 p-4 sm:p-5 hover:shadow-lg transition-shadow"
+                  >
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div
+                            className={`w-1 h-8 rounded-full ${priorityConfig.bgColor} ${priorityConfig.borderColor} border-2`}
+                          ></div>
+                          <h3 className="font-semibold text-slate-900 text-sm sm:text-base">
+                            {task.title}
+                          </h3>
+                        </div>
+                        <p className="text-xs text-slate-500 ml-3">
+                          #{task.id}
+                        </p>
+                      </div>
+                      <button className="w-8 h-8 rounded-lg hover:bg-emerald-50 flex items-center justify-center transition-colors flex-shrink-0">
+                        <MoreHorizontal className="w-5 h-5 text-slate-400" />
+                      </button>
+                    </div>
+
+                    {/* Status and Priority */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <div
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${statusConfig.bgColor}`}
+                      >
+                        <StatusIcon
+                          className={`w-3.5 h-3.5 ${statusConfig.textColor}`}
+                        />
+                        <span
+                          className={`text-xs font-medium ${statusConfig.textColor}`}
+                        >
+                          {statusConfig.label}
+                        </span>
+                      </div>
+                      <div
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border ${priorityConfig.bgColor} ${priorityConfig.textColor} ${priorityConfig.borderColor}`}
+                      >
+                        <div
+                          className={`w-1.5 h-1.5 rounded-full ${priorityConfig.textColor.replace("text-", "bg-")}`}
+                        ></div>
+                        <span className="text-xs font-medium">
+                          {priorityConfig.label}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Due Date */}
+                    <div className="flex items-center gap-2 mb-3 p-2 bg-slate-50 rounded-lg">
+                      <Calendar
+                        className={`w-4 h-4 flex-shrink-0 ${
+                          dateInfo.overdue
+                            ? "text-rose-500"
+                            : dateInfo.urgent
+                              ? "text-amber-500"
+                              : dateInfo.soon
+                                ? "text-teal-500"
+                                : "text-slate-400"
+                        }`}
+                      />
+                      <div>
+                        <p
+                          className={`text-xs font-medium ${
+                            dateInfo.overdue
+                              ? "text-rose-700"
+                              : dateInfo.urgent
+                                ? "text-amber-700"
+                                : "text-slate-700"
+                          }`}
+                        >
+                          {dateInfo.text}
+                        </p>
+                        <p
+                          className={`text-xs ${
+                            dateInfo.overdue
+                              ? "text-rose-600"
+                              : dateInfo.urgent
+                                ? "text-amber-600"
+                                : "text-slate-500"
+                          }`}
+                        >
+                          {dateInfo.daysText}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Assigned To */}
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-slate-600 font-medium">
+                        Assigned to:
+                      </p>
+                      <div className="flex items-center -space-x-2">
+                        {task.assignedTo.map((member, i) => (
+                          <div
+                            key={i}
+                            className="w-7 h-7 rounded-full border-2 border-white bg-gradient-to-br from-emerald-400 to-teal-500 overflow-hidden shadow-sm"
+                            title={member.name}
+                          >
+                            <img
+                              src={member.avatar}
+                              alt={member.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      {task.assignedTo.length > 0 && (
+                        <span className="text-xs text-slate-600 ml-1">
+                          {task.assignedTo.map((m) => m.name).join(", ")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Pagination Controls */}

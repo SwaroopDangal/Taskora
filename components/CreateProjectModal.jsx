@@ -45,7 +45,6 @@ export default function CreateProjectModal({ isOpen, setIsOpen, groupId }) {
       groupId,
     };
 
-    console.log("CREATE PROJECT PAYLOAD 👉", payload);
     createProjectMutation(payload);
   };
 

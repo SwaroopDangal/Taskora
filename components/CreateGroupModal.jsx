@@ -79,7 +79,6 @@ export default function CreateGroupModal({ isOpen, setIsOpen }) {
         groupType: groupType.toLowerCase(),
       };
 
-      console.log("CREATE GROUP PAYLOAD 👉", payload);
       groupCreationMutation(payload);
     } catch (error) {
       console.error("Group creation failed:", error);

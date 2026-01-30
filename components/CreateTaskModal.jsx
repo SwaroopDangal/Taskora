@@ -56,7 +56,6 @@ export default function CreateTaskModal({
     members.push(payload);
   });
 
-  console.log(members);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

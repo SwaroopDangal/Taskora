@@ -8,7 +8,6 @@ const DeleteGroupModal = ({ setShowDeleteGroupModal, groupId }) => {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const handleDeleteGroup = () => {
     if (deleteConfirmText === groupByIdData?.name) {
-      console.log("Deleting group...");
       deleteGroupMutation();
       setShowDeleteGroupModal(false);
     }

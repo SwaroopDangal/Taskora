@@ -85,7 +85,6 @@ export default function Dashboard() {
     groups.push(payload);
   });
 
-  console.log(groups);
   const hasgroups = groups.length > 0;
 
   if (isLoading) {

@@ -100,7 +100,6 @@ const TaskoraGroupPage = () => {
   };
 
   const members = groupByIdData?.members?.map((member) => {
-    console.log(member);
     const payload = {
       id: member?._id,
       name: member?.user?.name,
