@@ -111,4 +111,29 @@ export const DELETE = async (request, { params }) => {
             { status: 500 }
         );
     }
-};      
+};
+
+export const PATCH = async (request, { params }) => {
+    const { groupId, projectId, taskId } = await params;
+    const { user, error } = await protectRoute();
+    if (error) return error;
+    try {
+        await connectDB();
+
+        const { status } = await request.json();
+        if (!status) {
+            return NextResponse.json(
+                { message: "Status is required" },
+                { status: 400 }
+            );
+        }
+        await Task.findByIdAndUpdate(taskId, { status }, { new: true });
+        return NextResponse.json({ message: "Task updated successfully" }, { status: 200 });
+    } catch (error) {
+        console.log(error);
+        return NextResponse.json(
+            { message: "Error updating task" },
+            { status: 500 }
+        );
+    }
+};
