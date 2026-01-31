@@ -38,13 +38,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import CreateTaskModal from "@/components/CreateTaskModal";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import useGetProjectById from "@/hooks/useGetProjectById";
 import Loading from "@/components/Loader";
 import useGetTask from "@/hooks/useGetTask";
 import TaskActions from "@/components/TaskActions";
 
 export default function ProjectDetailPage() {
+  const router = useRouter();
   const { groupId, projectId } = useParams();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -223,6 +224,11 @@ export default function ProjectDetailPage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0">
               <Button
                 variant="outline"
+                onClick={() =>
+                  router.push(
+                    `/group/${groupId}/project/${projectId}/kanban-board`,
+                  )
+                }
                 className="border-slate-300 hover:bg-slate-50 w-full sm:w-auto"
               >
                 <LayoutGrid className="h-4 w-4 mr-2" />
