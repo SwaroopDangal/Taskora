@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  Calendar,
   AlertCircle,
-  Star,
-  Briefcase,
+  ListChecks,
+  Loader2,
   Filter,
   ArrowUpDown,
   ChevronRight,
@@ -27,7 +26,6 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import CreateGroupModal from "@/components/CreateGroupModal";
 import useGetGroups from "@/hooks/useGetGroups";
-import Image from "next/image";
 import Loading from "@/components/Loader";
 
 export default function Dashboard() {
@@ -36,54 +34,71 @@ export default function Dashboard() {
   const [isOpen, setIsOpen] = useState(false);
 
   const { data, isLoading } = useGetGroups();
-  // Mock data - replace with actual data from your backend
+
+  const groups = useMemo(() => {
+    if (!data) return [];
+
+    return data.map((group) => {
+      const tasks = group?.tasks ?? [];
+
+      const completedTasks = tasks.filter(
+        (task) => task.status === "completed",
+      );
+
+      const inProgressTasks = tasks.filter(
+        (task) => task.status === "in-progress",
+      );
+
+      const overdueTasks = tasks.filter(
+        (task) => task.dueDate && new Date(task.dueDate).getTime() < Date.now(),
+      );
+
+      return {
+        _id: group?._id,
+        imageUrl: group?.imageUrl,
+        name: group?.name,
+        description: group?.description,
+        type: group?.groupType,
+        members: group?.members?.length ?? 0,
+        projectCount: group?.projects?.length ?? 0,
+        taskCount: tasks.length,
+        completedTasks: completedTasks.length,
+        inProgressTasks: inProgressTasks.length,
+        overdueTasks: overdueTasks.length,
+      };
+    });
+  }, [data]);
+
   const stats = [
     {
-      title: "Tasks Due Today",
-      value: 8,
-      icon: Calendar,
+      title: "Groups",
+      value: groups.length,
+      icon: Building2,
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50",
+    },
+    {
+      title: "Total Tasks",
+      value: groups.reduce((acc, group) => acc + group.taskCount, 0),
+      icon: ListChecks,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
     },
     {
-      title: "Overdue Tasks",
-      value: 3,
-      icon: AlertCircle,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-    },
-    {
-      title: "High Priority Tasks",
-      value: 12,
-      icon: Star,
+      title: "In Progress",
+      value: groups.reduce((acc, group) => acc + group.inProgressTasks, 0),
+      icon: Loader2,
       color: "text-amber-600",
       bgColor: "bg-amber-50",
     },
     {
-      title: "Active groups",
-      value: 5,
-      icon: Building2,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
+      title: "Overdue",
+      value: groups.reduce((acc, group) => acc + group.overdueTasks, 0),
+      icon: AlertCircle,
+      color: "text-red-600",
+      bgColor: "bg-red-50",
     },
   ];
-
-  const groups = [];
-  data?.map((group) => {
-    const payload = {
-      _id: group?._id,
-      imageUrl: group?.imageUrl,
-      name: group?.name,
-      description: group?.description,
-      type: group?.groupType,
-      members: group?.members.length,
-      projectCount: group?.projects?.length,
-      taskCount: group?.tasks?.length,
-      completedTasks:
-        group?.tasks?.filter((task) => task.status === "completed").length || 0,
-    };
-    groups.push(payload);
-  });
 
   const hasgroups = groups.length > 0;
 
