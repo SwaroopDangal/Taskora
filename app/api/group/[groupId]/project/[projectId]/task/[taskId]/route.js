@@ -40,12 +40,7 @@ export const PUT = async (request, { params }) => {
     const { groupId, projectId, taskId } = await params;
     const { user, error } = await protectRoute();
     if (error) return error;
-    if (task.createdBy.toString() !== user._id.toString()) {
-        return NextResponse.json(
-            { message: "Not authorized" },
-            { status: 403 }
-        );
-    }
+
 
     const {
         name,

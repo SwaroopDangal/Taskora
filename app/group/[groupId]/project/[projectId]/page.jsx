@@ -42,6 +42,7 @@ import { useParams } from "next/navigation";
 import useGetProjectById from "@/hooks/useGetProjectById";
 import Loading from "@/components/Loader";
 import useGetTask from "@/hooks/useGetTask";
+import TaskActions from "@/components/TaskActions";
 
 export default function ProjectDetailPage() {
   const { groupId, projectId } = useParams();
@@ -576,10 +577,12 @@ export default function ProjectDetailPage() {
                           </td>
 
                           {/* Actions */}
-                          <td className="py-4 px-6">
-                            <button className="w-8 h-8 rounded-lg hover:bg-emerald-50 flex items-center justify-center transition-colors group">
-                              <MoreHorizontal className="w-5 h-5 text-slate-400 group-hover:text-emerald-600" />
-                            </button>
+                          <td className="py-4 px-6 relative overflow-visible text-right">
+                            <TaskActions
+                              taskId={task.id}
+                              groupId={groupId}
+                              projectId={projectId}
+                            />
                           </td>
                         </tr>
                       );
