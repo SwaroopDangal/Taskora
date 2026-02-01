@@ -50,7 +50,10 @@ export default function Dashboard() {
       );
 
       const overdueTasks = tasks.filter(
-        (task) => task.dueDate && new Date(task.dueDate).getTime() < Date.now(),
+        (task) =>
+          task.dueDate &&
+          task.status !== "completed" &&
+          new Date(task.dueDate).getTime() < Date.now(),
       );
 
       return {

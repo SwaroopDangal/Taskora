@@ -77,7 +77,6 @@ export default function ProjectDetailPage() {
     };
     tasks.push(payload);
   });
-  console.log(tasks);
 
   const project = {
     id: projectByIdData?._id,
@@ -450,6 +449,7 @@ export default function ProjectDetailPage() {
                       const statusConfig = getStatusConfig(task.status);
                       const priorityConfig = getPriorityConfig(task.priority);
                       const dateInfo = formatDate(task.dueDate);
+                      console.log(dateInfo);
                       const StatusIcon = statusConfig.icon;
 
                       return (
@@ -515,7 +515,8 @@ export default function ProjectDetailPage() {
                             <div className="flex items-center gap-2">
                               <Calendar
                                 className={`w-4 h-4 flex-shrink-0 ${
-                                  dateInfo.overdue
+                                  dateInfo.overdue &&
+                                  task.status !== "completed"
                                     ? "text-rose-500"
                                     : dateInfo.urgent
                                       ? "text-amber-500"
@@ -527,7 +528,8 @@ export default function ProjectDetailPage() {
                               <div>
                                 <p
                                   className={`text-sm font-medium ${
-                                    dateInfo.overdue
+                                    dateInfo.overdue &&
+                                    task.status !== "completed"
                                       ? "text-rose-700"
                                       : dateInfo.urgent
                                         ? "text-amber-700"
@@ -538,14 +540,21 @@ export default function ProjectDetailPage() {
                                 </p>
                                 <p
                                   className={`text-xs ${
-                                    dateInfo.overdue
+                                    dateInfo.overdue &&
+                                    task.status !== "completed"
                                       ? "text-rose-600"
                                       : dateInfo.urgent
                                         ? "text-amber-600"
                                         : "text-slate-500"
                                   }`}
                                 >
-                                  {dateInfo.daysText}
+                                  {task.status === "completed" ? (
+                                    <p className="text-green-600 font-bold">
+                                      Completed
+                                    </p>
+                                  ) : (
+                                    dateInfo.daysText
+                                  )}
                                 </p>
                               </div>
                             </div>

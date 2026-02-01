@@ -107,7 +107,10 @@ const TaskoraGroupPage = () => {
     ).length;
 
     const dueTasks = tasks.filter(
-      (task) => task.dueDate && new Date(task.dueDate).getTime() < now,
+      (task) =>
+        task.dueDate &&
+        task.status !== "completed" &&
+        new Date(task.dueDate).getTime() < now,
     ).length;
 
     return {
