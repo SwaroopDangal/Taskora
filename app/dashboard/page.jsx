@@ -103,6 +103,37 @@ export default function Dashboard() {
     },
   ];
 
+  const filteredGroups = groups.filter((group) => {
+    if (filterBy === "All") return true;
+    if (filterBy === "Personal" && group.type === "personal") return true;
+    if (filterBy === "Public" && group.type === "public") return true;
+    return false;
+  });
+
+  const sortedGroups = useMemo(() => {
+    const list = [...filteredGroups];
+
+    switch (sortBy) {
+      case "Name":
+        return list.sort((a, b) => a.name.localeCompare(b.name));
+
+      case "Progress": {
+        return list.sort((a, b) => {
+          const progressA = a.taskCount ? a.completedTasks / a.taskCount : 0;
+          const progressB = b.taskCount ? b.completedTasks / b.taskCount : 0;
+
+          return progressB - progressA;
+        });
+      }
+
+      case "Members":
+        return list.sort((a, b) => b.members - a.members);
+
+      default:
+        return list;
+    }
+  }, [filteredGroups, sortBy]);
+
   const hasgroups = groups.length > 0;
 
   if (isLoading) {
@@ -172,11 +203,8 @@ export default function Dashboard() {
               <DropdownMenuItem onClick={() => setFilterBy("Personal")}>
                 Personal Only
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterBy("Groups")}>
-                Groups Only
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setFilterBy("Active")}>
-                Active groups
+              <DropdownMenuItem onClick={() => setFilterBy("Public")}>
+                Public Only
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -192,9 +220,6 @@ export default function Dashboard() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuItem onClick={() => setSortBy("Recently Updated")}>
-                Recently Updated
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setSortBy("Name")}>
                 Name
               </DropdownMenuItem>
@@ -225,7 +250,7 @@ export default function Dashboard() {
 
           {hasgroups ? (
             <div className="grid grid-cols-1 gap-4">
-              {groups.map((group) => {
+              {sortedGroups.map((group) => {
                 return (
                   <Card
                     key={group._id}
