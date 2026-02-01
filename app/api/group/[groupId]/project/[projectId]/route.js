@@ -92,3 +92,96 @@ export const GET = async (request, { params }) => {
         );
     }
 };
+
+// NOTE: update project by id
+export const PUT = async (request, { params }) => {
+    const { groupId, projectId } = await params;
+    const { user, error } = await protectRoute();
+    if (error) return error;
+    const {
+        name,
+        description,
+        dueDate,
+        status,
+        priority,
+    } = await request.json();
+    if (!name || !dueDate || !status || !priority)
+        return NextResponse.json(
+            { message: "Fields are required" },
+            { status: 400 }
+        );
+    try {
+        await connectDB();
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return NextResponse.json(
+                { message: "Group not found" }, { status: 404 });
+        }
+        const project = await Project.findOne({
+            _id: projectId,
+            group: groupId,
+        });
+        if (!project) {
+            return NextResponse.json(
+                { message: "Project not found" }, { status: 404 });
+        }
+        project.set({
+            name,
+            description,
+            dueDate,
+            status,
+            priority,
+        });
+
+        await project.save();
+        return NextResponse.json(project, { status: 200 });
+    } catch (error) {
+        console.log(error);
+        return NextResponse.json(
+            { message: "Error updating project" },
+            { status: 500 }
+        );
+    }
+
+};
+
+// NOTE: delete project by id
+export const DELETE = async (request, { params }) => {
+    const { groupId, projectId } = await params;
+    const { user, error } = await protectRoute();
+    if (error) return error;
+    try {
+        await connectDB();
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return NextResponse.json(
+                { message: "Group not found" }, { status: 404 });
+        }
+        const project = await Project.findOne({
+            _id: projectId,
+            group: groupId,
+        });
+        if (!project) {
+            return NextResponse.json(
+                { message: "Project not found" }, { status: 404 });
+        }
+        // delete project
+        await Project.deleteOne({ _id: projectId });
+
+        //  delete all tasks under project
+        await Task.deleteMany({ project: projectId });
+
+        // remove project reference from group
+        group.projects.pull(projectId);
+        await group.save();
+
+
+        return NextResponse.json({ message: "Project deleted" }, { status: 200 });
+    } catch (error) {
+        console.log(error);
+        return NextResponse.json(
+            { message: "Error deleting project" },
+            { status: 500 }
+        );
+    }
+};

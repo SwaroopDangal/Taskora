@@ -36,10 +36,11 @@ export const POST = async (request, { params }) => {
             name,
             description,
             dueDate,
-
+            status,
             priority,
             group: groupId,
-            role: [{ user: user._id, role: "creator" }],
+            admin: user._id,
+
         });
 
         group.projects.push(project._id);
