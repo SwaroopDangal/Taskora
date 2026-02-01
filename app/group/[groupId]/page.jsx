@@ -27,6 +27,12 @@ import {
   Loader,
   AlertTriangle,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import CreateProjectModal from "@/components/CreateProjectModal";
@@ -36,9 +42,10 @@ import Loading from "@/components/Loader";
 import useGetInvitationalLink from "@/hooks/useGetInvitationalLink";
 import InviteModal from "@/components/InviteModal";
 import useUpdateGroup from "@/hooks/useUpdateGroup";
-import useDeleteGroup from "@/hooks/useDeleteGroup";
 import DeleteGroupModal from "@/components/DeleteGroupModal";
 import Image from "next/image";
+import UpdateProjectModal from "@/components/UpdateProjectModal";
+import DeleteProjectModal from "@/components/DeleteProjectModal";
 
 const TaskoraGroupPage = () => {
   const { groupId } = useParams();
@@ -50,6 +57,9 @@ const TaskoraGroupPage = () => {
   const [copied, setCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [projectToBeChanged, setProjectToBeChanged] = useState(null);
   const [now, setNow] = useState(() => Date.now());
 
   const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false);
@@ -77,7 +87,7 @@ const TaskoraGroupPage = () => {
         (task) => task.status === "completed",
       ).length;
 
-      const leadRole = project?.role?.[0];
+      console.log(project);
 
       return {
         id: project?._id,
@@ -88,8 +98,8 @@ const TaskoraGroupPage = () => {
         priority: project?.priority,
         totalTasks: tasks.length,
         lead: {
-          name: leadRole?.user?.name ?? "—",
-          avatar: leadRole?.user?.profileImage ?? null,
+          name: project?.admin?.name ?? "",
+          avatar: project?.admin?.profileImage ?? null,
           color: "from-blue-500 to-cyan-500",
         },
         completedTasks,
@@ -141,17 +151,17 @@ const TaskoraGroupPage = () => {
 
   const getStatusConfig = (status) => {
     const configs = {
-      active: {
+     "active": {
         label: "Active",
         className: "bg-green-50 text-green-700 border-green-200",
         dotColor: "bg-green-500",
       },
-      "on-hold": {
+      "On Hold": {
         label: "On Hold",
         className: "bg-yellow-50 text-yellow-700 border-yellow-200",
         dotColor: "bg-yellow-500",
       },
-      completed: {
+      "Completed": {
         label: "Completed",
         className: "bg-blue-50 text-blue-700 border-blue-200",
         dotColor: "bg-blue-500",
@@ -469,24 +479,67 @@ const TaskoraGroupPage = () => {
               ) : viewMode === "list" ? (
                 <div className="divide-y divide-gray-200">
                   {filteredProjects.map((project) => {
+                    console.log(project);
                     const progress =
-                      (Number(project.completedTasks) /
-                        Number(project.totalTasks)) *
-                      100;
+                      project.totalTasks > 0
+                        ? Math.round(
+                            (project.completedTasks / project.totalTasks) * 100,
+                          )
+                        : 0;
+
                     const statusConfig = getStatusConfig(project.status);
                     const priorityConfig = getPriorityConfig(project.priority);
 
                     return (
                       <div
                         key={project.id}
-                        className="p-4 sm:p-5 lg:p-6 hover:bg-gray-50 transition-colors group"
+                        className="relative p-4 sm:p-5 lg:p-6 hover:bg-gray-50 transition-colors group"
                       >
+                        {/* 3-dot menu */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              className="absolute top-4 right-4 p-2 rounded-lg
+                       text-gray-500 hover:text-gray-700
+                       hover:bg-gray-100
+                       opacity-100 lg:opacity-0 lg:group-hover:opacity-100
+                       transition"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="w-5 h-5" />
+                            </button>
+                          </DropdownMenuTrigger>
+
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setProjectToBeChanged(project.id);
+                                setIsUpdateOpen(true);
+                              }}
+                            >
+                              Edit
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => {
+                                setProjectToBeChanged(project.id);
+                                setIsDeleteOpen(true);
+                              }}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        {/* Main content */}
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
                               <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                                 {project.name}
                               </h3>
+
                               <span
                                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border ${statusConfig.className}`}
                               >
@@ -495,44 +548,43 @@ const TaskoraGroupPage = () => {
                                 />
                                 {statusConfig.label}
                               </span>
+
                               <span
                                 className={`px-2.5 py-1 rounded-md text-xs font-medium border ${priorityConfig.className}`}
                               >
                                 {priorityConfig.label}
                               </span>
                             </div>
+
                             <p className="text-sm sm:text-base text-gray-600 mb-4">
                               {project.description}
                             </p>
 
                             <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                              {/* Lead */}
                               <div className="flex items-center gap-2">
-                                <div
-                                  className={`w-7 h-7 rounded-full bg-gradient-to-br ${project.lead.color} flex items-center justify-center text-white text-xs font-medium`}
-                                >
-                                  <Image
-                                    src={project.lead.avatar}
-                                    alt={project.lead.name}
-                                    width={40}
-                                    height={40}
-                                    className="rounded-full"
-                                  />
-                                </div>
+                                <Image
+                                  src={project.lead.avatar}
+                                  alt={project.lead.name}
+                                  width={28}
+                                  height={28}
+                                  className="rounded-full"
+                                />
                                 <span className="text-sm text-gray-600">
                                   {project.lead.name}
                                 </span>
                               </div>
 
+                              {/* Tasks */}
                               <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <CheckCircle2 className="w-4 h-4" />
                                 <span>
                                   {project.completedTasks}/{project.totalTasks}{" "}
                                   tasks
                                 </span>
                               </div>
 
+                              {/* Due date */}
                               <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <Calendar className="w-4 h-4" />
                                 <span>
                                   Due{" "}
                                   {new Date(project.dueDate).toLocaleDateString(
@@ -542,6 +594,7 @@ const TaskoraGroupPage = () => {
                                 </span>
                               </div>
 
+                              {/* Progress */}
                               {project.totalTasks > 0 && (
                                 <div className="flex-1 min-w-[200px] max-w-xs">
                                   <div className="flex items-center justify-between text-xs text-gray-600 mb-1.5">
@@ -553,9 +606,7 @@ const TaskoraGroupPage = () => {
                                   <div className="w-full bg-gray-200 rounded-full h-2">
                                     <div
                                       className="bg-indigo-600 h-2 rounded-full transition-all"
-                                      style={{
-                                        width: `${progress}%`,
-                                      }}
+                                      style={{ width: `${progress}%` }}
                                     />
                                   </div>
                                 </div>
@@ -563,8 +614,13 @@ const TaskoraGroupPage = () => {
                             </div>
                           </div>
 
+                          {/* Open button */}
                           <button
-                            className="lg:ml-6 px-4 sm:px-5 py-2 sm:py-2.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm font-medium lg:opacity-0 lg:group-hover:opacity-100"
+                            className="lg:ml-6 px-4 sm:px-5 py-2 sm:py-2.5
+                     text-indigo-600 bg-indigo-50 hover:bg-indigo-100
+                     rounded-lg transition-colors
+                     flex items-center gap-2 text-sm font-medium
+                     lg:opacity-0 lg:group-hover:opacity-100"
                             onClick={() =>
                               router.push(
                                 `/group/${groupData.id}/project/${project.id}`,
@@ -572,7 +628,6 @@ const TaskoraGroupPage = () => {
                             }
                           >
                             Open
-                            <ArrowUpRight className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
@@ -886,6 +941,22 @@ const TaskoraGroupPage = () => {
         <DeleteGroupModal
           setShowDeleteGroupModal={setShowDeleteGroupModal}
           groupId={groupId}
+        />
+      )}
+      {isUpdateOpen && (
+        <UpdateProjectModal
+          isOpen={isUpdateOpen}
+          setIsOpen={setIsUpdateOpen}
+          groupId={groupId}
+          projectId={projectToBeChanged}
+        />
+      )}
+      {isDeleteOpen && (
+        <DeleteProjectModal
+          isOpen={isDeleteOpen}
+          setIsOpen={setIsDeleteOpen}
+          groupId={groupId}
+          projectId={projectToBeChanged}
         />
       )}
     </div>

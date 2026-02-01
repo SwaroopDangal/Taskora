@@ -29,13 +29,13 @@ const taskSchema = new mongoose.Schema(
       type: String,
       enum: ["todo", "in-progress", "completed"],
       default: "todo",
+      required: true,
     },
-
-    order: { type: Number, default: 0 },
     priority: {
       type: String,
       enum: ["low", "medium", "high"],
       default: "medium",
+      required: true,
     },
 
 

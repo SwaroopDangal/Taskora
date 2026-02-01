@@ -24,19 +24,6 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
-    groups: [
-      {
-        group: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Group",
-        },
-        role: {
-          type: String,
-          enum: ["admin", "member", "owner"],
-          default: "member",
-        },
-      },
-    ],
   },
   { timestamps: true }
 );

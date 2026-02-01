@@ -13,16 +13,11 @@ const projectSchema = new mongoose.Schema(
       default: null,
     },
 
-    role: [
-      {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        role: {
-          type: String,
-          enum: ["admin", "member"],
-          default: "member",
-        },
-      },
-    ],
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     tasks: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -32,15 +27,19 @@ const projectSchema = new mongoose.Schema(
     dueDate: {
       type: Date,
       default: null,
+      required: true,
     },
     status: {
       type: String,
       enum: ["active", "On Hold", "Completed"],
       default: "active",
+      required: true,
     },
     priority: {
       type: String,
       enum: ["low", "medium", "high"],
+      default: "low",
+      required: true,
     },
   },
   { timestamps: true }

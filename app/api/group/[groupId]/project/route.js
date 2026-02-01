@@ -64,7 +64,7 @@ export const GET = async (request, { params }) => {
         await connectDB();
         const projects = await Project.find({
             group: groupId,
-        }).populate("role.user", "_id name email profileImage")
+        }).populate("admin", "_id name email profileImage")
             .populate("group", "_id name description imageUrl groupType")
             .populate("tasks", "_id name description status dueDate priority")
             .lean();

@@ -96,6 +96,7 @@ export const GET = async (request, { params }) => {
 // NOTE: update project by id
 export const PUT = async (request, { params }) => {
     const { groupId, projectId } = await params;
+    console.log(groupId, projectId)
     const { user, error } = await protectRoute();
     if (error) return error;
     const {
