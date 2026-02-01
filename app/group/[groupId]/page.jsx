@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Users,
   Settings,
@@ -25,6 +25,7 @@ import {
   Check,
   User,
   Loader,
+  AlertTriangle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
@@ -49,6 +50,8 @@ const TaskoraGroupPage = () => {
   const [copied, setCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+
   const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false);
 
   const { projectsData, isLoading: isProjectLoading } = useGetProjects(groupId);
@@ -57,47 +60,69 @@ const TaskoraGroupPage = () => {
     useGetInvitationalLink(groupId);
 
   const { groupByIdData, isLoading } = useGetGroupById(groupId);
+  console.log(groupByIdData);
 
   const [edits, setEdits] = useState({});
 
   const name = edits.name ?? groupByIdData?.name ?? "";
   const description = edits.description ?? groupByIdData?.description ?? "";
 
-  let projects = [];
-  projectsData?.map((project) => {
-    const payload = {
-      id: project?._id,
-      name: project?.name,
-      description: project?.description,
-      status: project?.status,
-      dueDate: project?.dueDate,
-      priority: project?.priority,
-      totalTasks: project?.tasks?.length,
-      lead: {
-        name: project?.role.map((role) => role?.user?.name)[0],
-        avatar: project?.role.map((role) => role?.user?.profileImage)[0],
-        color: "from-blue-500 to-cyan-500",
-      },
-      completedTasks: project?.tasks?.filter(
-        (task) => task.status === "completed",
-      ).length,
-    };
+  const projects = useMemo(() => {
+    if (!projectsData) return [];
 
-    projects.push(payload);
-  });
-  const groupData = {
-    id: groupByIdData?._id,
-    name: groupByIdData?.name,
-    groupType: groupByIdData?.groupType,
-    description: groupByIdData?.description,
-    logo: groupByIdData?.imageUrl,
-    memberCount: groupByIdData?.members?.length,
-    totalProjects: groupByIdData?.projects?.length,
-    totalTasks: groupByIdData?.tasks?.length,
-    completedTasks: groupByIdData?.tasks?.filter(
+    return projectsData.map((project) => {
+      const tasks = project?.tasks ?? [];
+
+      const completedTasks = tasks.filter(
+        (task) => task.status === "completed",
+      ).length;
+
+      const leadRole = project?.role?.[0];
+
+      return {
+        id: project?._id,
+        name: project?.name,
+        description: project?.description,
+        status: project?.status,
+        dueDate: project?.dueDate,
+        priority: project?.priority,
+        totalTasks: tasks.length,
+        lead: {
+          name: leadRole?.user?.name ?? "—",
+          avatar: leadRole?.user?.profileImage ?? null,
+          color: "from-blue-500 to-cyan-500",
+        },
+        completedTasks,
+      };
+    });
+  }, [projectsData]);
+
+  const groupData = useMemo(() => {
+    if (!groupByIdData) return null;
+
+    const tasks = groupByIdData.tasks ?? [];
+
+    const completedTasks = tasks.filter(
       (task) => task.status === "completed",
-    ).length,
-  };
+    ).length;
+
+    const dueTasks = tasks.filter(
+      (task) => task.dueDate && new Date(task.dueDate).getTime() < now,
+    ).length;
+
+    return {
+      id: groupByIdData._id,
+      name: groupByIdData.name,
+      groupType: groupByIdData.groupType,
+      description: groupByIdData.description,
+      logo: groupByIdData.imageUrl,
+      memberCount: groupByIdData.members?.length ?? 0,
+      totalProjects: groupByIdData.projects?.length ?? 0,
+      totalTasks: tasks.length,
+      completedTasks,
+      dueTasks,
+    };
+  }, [groupByIdData, now]);
 
   const members = groupByIdData?.members?.map((member) => {
     const payload = {
@@ -309,43 +334,56 @@ const TaskoraGroupPage = () => {
         {activeSection === "overview" && (
           <>
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8 lg:mb-10">
-              <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 lg:p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">
-                    Total Projects
-                  </p>
-                  <FolderKanban className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 mb-8">
+              {/* Total Projects */}
+              <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-600">Projects</p>
+                  <FolderKanban className="w-5 h-5 text-indigo-500" />
                 </div>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                <p className="text-3xl font-bold text-gray-900">
                   {groupData.totalProjects}
                 </p>
               </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 lg:p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">
-                    Total Tasks
-                  </p>
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+
+              {/* Total Tasks */}
+              <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-600">Tasks</p>
+                  <CheckCircle2 className="w-5 h-5 text-blue-500" />
                 </div>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                <p className="text-3xl font-bold text-gray-900">
                   {groupData.totalTasks}
                 </p>
               </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 lg:p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">
-                    Completed
-                  </p>
-                  <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+
+              {/* Overdue Tasks (highlighted) */}
+              <div className="bg-red-50 rounded-xl border border-red-200 p-5 hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-red-600">Overdue</p>
+                  <AlertTriangle className="w-5 h-5 text-red-500" />
                 </div>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                <p className="text-3xl font-bold text-red-600">
+                  {groupData.dueTasks}
+                </p>
+                <p className="text-xs text-red-500 mt-1">Needs attention</p>
+              </div>
+
+              {/* Completed Tasks */}
+              <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-600">Completed</p>
+                  <TrendingUp className="w-5 h-5 text-green-500" />
+                </div>
+                <p className="text-3xl font-bold text-gray-900">
                   {groupData.completedTasks}
                 </p>
-                <p className="text-xs sm:text-sm text-gray-500 mt-2">
-                  {Math.round(
-                    (groupData.completedTasks / groupData.totalTasks) * 100,
-                  )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {groupData.totalTasks
+                    ? Math.round(
+                        (groupData.completedTasks / groupData.totalTasks) * 100,
+                      )
+                    : 0}
                   % completion
                 </p>
               </div>
@@ -602,7 +640,13 @@ const TaskoraGroupPage = () => {
                             <div
                               className={`w-7 h-7 rounded-full bg-gradient-to-br ${project.lead.color} flex items-center justify-center text-white text-xs font-medium`}
                             >
-                              {project.lead.avatar}
+                              <Image
+                                src={project.lead.avatar}
+                                alt={project.lead.name}
+                                width={40}
+                                height={40}
+                                className="rounded-full"
+                              />
                             </div>
                             <span className="text-xs sm:text-sm text-gray-600">
                               Due{" "}
