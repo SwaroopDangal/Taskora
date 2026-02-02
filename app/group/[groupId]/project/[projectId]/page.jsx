@@ -144,6 +144,30 @@ export default function ProjectDetailPage() {
     return configs[status] || configs.todo;
   };
 
+  const filterTasks = tasks?.filter((task) => {
+    if (filterStatus === "All") return true;
+    if (filterStatus === task.status) return true;
+    return false;
+  });
+
+  const filterTasksByPriority = filterTasks?.filter((task) => {
+    if (filterPriority === "All") return true;
+    if (filterPriority === task.priority) return true;
+    return false;
+  });
+
+  const sortedSearchedTasks = filterTasksByPriority
+    .filter((p) => p.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => {
+      if (sortBy === "Due date")
+        return new Date(a.dueDate) - new Date(b.dueDate);
+      if (sortBy === "Priority") {
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
+      }
+      return 0;
+    });
+
   // Helper function to get priority badge
 
   const getPriorityConfig = (priority) => {
@@ -350,16 +374,16 @@ export default function ProjectDetailPage() {
                 <DropdownMenuItem onClick={() => setFilterStatus("All")}>
                   All Statuses
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterStatus("To Do")}>
+                <DropdownMenuItem onClick={() => setFilterStatus("todo")}>
                   To Do
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => setFilterStatus("In Progress")}
+                  onClick={() => setFilterStatus("in-progress")}
                 >
                   In Progress
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterStatus("Done")}>
-                  Done
+                <DropdownMenuItem onClick={() => setFilterStatus("completed")}>
+                  Completed
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -379,13 +403,13 @@ export default function ProjectDetailPage() {
                 <DropdownMenuItem onClick={() => setFilterPriority("All")}>
                   All Priorities
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterPriority("High")}>
+                <DropdownMenuItem onClick={() => setFilterPriority("high")}>
                   High
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterPriority("Medium")}>
+                <DropdownMenuItem onClick={() => setFilterPriority("medium")}>
                   Medium
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterPriority("Low")}>
+                <DropdownMenuItem onClick={() => setFilterPriority("low")}>
                   Low
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -408,9 +432,6 @@ export default function ProjectDetailPage() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setSortBy("Priority")}>
                   Priority
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy("Recently updated")}>
-                  Recently updated
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -445,7 +466,7 @@ export default function ProjectDetailPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {tasks.map((task, index) => {
+                    {sortedSearchedTasks.map((task, index) => {
                       const statusConfig = getStatusConfig(task.status);
                       const priorityConfig = getPriorityConfig(task.priority);
                       const dateInfo = formatDate(task.dueDate);
@@ -549,9 +570,9 @@ export default function ProjectDetailPage() {
                                   }`}
                                 >
                                   {task.status === "completed" ? (
-                                    <p className="text-green-600 font-bold">
+                                    <span className="text-green-600 font-bold">
                                       Completed
-                                    </p>
+                                    </span>
                                   ) : (
                                     dateInfo.daysText
                                   )}
