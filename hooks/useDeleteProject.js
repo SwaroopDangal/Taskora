@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 
 const useDeleteProject = (groupId, projectId) => {
     const queryClient = useQueryClient();
-    const router = useRouter();
     const { mutate: deleteProjectMutation, isPending: isDeleteProjectPending } = useMutation({
         mutationKey: ["delete-group", groupId],
         mutationFn: () => deleteProject(groupId, projectId),
@@ -15,6 +14,9 @@ const useDeleteProject = (groupId, projectId) => {
             toast.success(data?.message || "Project deleted successfully");
             queryClient.invalidateQueries({
                 queryKey: ["projects", groupId],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["group", groupId],
             });
         },
         onError: (error) => toast.error(error.response.data.message),
