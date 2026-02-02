@@ -1,8 +1,9 @@
 "use client";
 
 import useVerifyInvitationallink from "@/hooks/useVerifyInvitationallink";
+import { useAuth } from "@clerk/nextjs";
 import { Link2, Loader2 } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const Verification = () => {
@@ -11,6 +12,14 @@ const Verification = () => {
     groupId,
     token,
   });
+  const { isSignedIn, isLoaded } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.replace("/"); 
+    }
+  }, [isLoaded, isSignedIn, router]);
 
   useEffect(() => {
     if (token) verifyInvite();

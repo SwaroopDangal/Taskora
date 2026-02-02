@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
   ListChecks,
@@ -27,6 +27,8 @@ import Link from "next/link";
 import CreateGroupModal from "@/components/CreateGroupModal";
 import useGetGroups from "@/hooks/useGetGroups";
 import Loading from "@/components/Loader";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   const [sortBy, setSortBy] = useState("Recently Updated");
@@ -34,6 +36,8 @@ export default function Dashboard() {
   const [isOpen, setIsOpen] = useState(false);
 
   const { data, isLoading } = useGetGroups();
+  const { isSignedIn, isLoaded } = useAuth();
+  const router = useRouter();
 
   const groups = useMemo(() => {
     if (!data) return [];
@@ -135,6 +139,12 @@ export default function Dashboard() {
   }, [filteredGroups, sortBy]);
 
   const hasgroups = groups.length > 0;
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      router.replace("/");
+    }
+  }, [isLoaded, isSignedIn, router]);
 
   if (isLoading) {
     return <Loading />;

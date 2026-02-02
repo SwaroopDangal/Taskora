@@ -19,8 +19,9 @@ export async function GET(req, { params }) {
 
         if (!member) {
             return NextResponse.json(
-                { message: "You are not a member of this group" },
-                { status: 403 }
+
+                { role: "guest" },
+                { status: 200 }
             );
         }
 
