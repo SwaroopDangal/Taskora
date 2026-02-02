@@ -27,7 +27,7 @@ export async function GET(req, { params }) {
 
         if (member.role === "admin") {
             return NextResponse.json(
-                { role: "groupAdmin" },
+                { role: "groupAdmin", userId: user._id },
                 { status: 200 }
             );
         }
@@ -41,12 +41,12 @@ export async function GET(req, { params }) {
         }
         if (user._id.toString() === project.admin.toString()) {
             return NextResponse.json(
-                { role: "admin" },
+                { role: "admin", userId: user._id },
                 { status: 200 }
             );
         }
         return NextResponse.json(
-            { role: "member" },
+            { role: "member", userId: user._id },
             { status: 200 }
         );
 

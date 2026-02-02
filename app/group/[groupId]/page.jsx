@@ -46,6 +46,8 @@ import DeleteGroupModal from "@/components/DeleteGroupModal";
 import Image from "next/image";
 import UpdateProjectModal from "@/components/UpdateProjectModal";
 import DeleteProjectModal from "@/components/DeleteProjectModal";
+import useGetMyRoleInGroup from "@/hooks/useGetMyRoleInGroup";
+import toast from "react-hot-toast";
 
 const TaskoraGroupPage = () => {
   const { groupId } = useParams();
@@ -65,12 +67,13 @@ const TaskoraGroupPage = () => {
   const [showDeleteGroupModal, setShowDeleteGroupModal] = useState(false);
 
   const { projectsData, isLoading: isProjectLoading } = useGetProjects(groupId);
+  const { myRoleInGroup, roleLoading } = useGetMyRoleInGroup(groupId);
+  const isAdmin = myRoleInGroup?.role === "admin";
   const { groupUpdateMutation, updatePending } = useUpdateGroup();
   const { invitationLink, isLoading: isInvitationLoading } =
     useGetInvitationalLink(groupId);
 
   const { groupByIdData, isLoading } = useGetGroupById(groupId);
-  console.log(groupByIdData);
 
   const [edits, setEdits] = useState({});
 
@@ -86,8 +89,6 @@ const TaskoraGroupPage = () => {
       const completedTasks = tasks.filter(
         (task) => task.status === "completed",
       ).length;
-
-      console.log(project);
 
       return {
         id: project?._id,
@@ -138,20 +139,26 @@ const TaskoraGroupPage = () => {
   }, [groupByIdData, now]);
 
   const members = groupByIdData?.members?.map((member) => {
+    const taskCount =
+      groupByIdData?.tasks
+        ?.map((task) => task.assignedTo)
+        ?.filter((arr) => arr.includes(member.user._id)).length || 0;
+
     const payload = {
-      id: member?._id,
+      id: member?.user?._id,
       name: member?.user?.name,
       avatar: member?.user?.profileImage,
       role: member?.role,
       email: member?.user?.email,
-      taskCount: 10,
+      taskCount,
     };
+
     return payload;
   });
 
   const getStatusConfig = (status) => {
     const configs = {
-     "active": {
+      active: {
         label: "Active",
         className: "bg-green-50 text-green-700 border-green-200",
         dotColor: "bg-green-500",
@@ -161,7 +168,7 @@ const TaskoraGroupPage = () => {
         className: "bg-yellow-50 text-yellow-700 border-yellow-200",
         dotColor: "bg-yellow-500",
       },
-      "Completed": {
+      Completed: {
         label: "Completed",
         className: "bg-blue-50 text-blue-700 border-blue-200",
         dotColor: "bg-blue-500",
@@ -190,7 +197,9 @@ const TaskoraGroupPage = () => {
 
   const handleUpdateGroup = async (e) => {
     e.preventDefault();
-    if (!name) return;
+    if (!isAdmin) return toast.error("You are not an admin of this group");
+    if (!name) return toast.error("Name field is required");
+
     const payload = {
       name: edits.name ?? groupByIdData?.name,
       description: edits.description ?? groupByIdData?.description,
@@ -479,7 +488,6 @@ const TaskoraGroupPage = () => {
               ) : viewMode === "list" ? (
                 <div className="divide-y divide-gray-200">
                   {filteredProjects.map((project) => {
-                    console.log(project);
                     const progress =
                       project.totalTasks > 0
                         ? Math.round(
@@ -914,7 +922,11 @@ const TaskoraGroupPage = () => {
               </p>
               <button
                 className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 font-medium text-sm sm:text-base"
-                onClick={() => setShowDeleteGroupModal(true)}
+                onClick={() => {
+                  isAdmin
+                    ? setShowDeleteGroupModal(true)
+                    : toast.error("You are not an admin of this group");
+                }}
               >
                 <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                 Delete Group

@@ -17,7 +17,7 @@ export const GET = async (request, { params }) => {
     const group = await Group.findById(groupId)
       .populate("projects", "_id name description status dueDate priority")
       .populate("members.user", " name email profileImage")
-      .populate("tasks", "_id name description status dueDate priority");
+      .populate("tasks", "_id name description status dueDate assignedTo priority");
     if (!group) {
       return NextResponse.json(
         { message: "Group not found" }, { status: 404 });

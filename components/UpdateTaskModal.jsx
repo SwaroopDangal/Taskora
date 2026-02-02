@@ -32,6 +32,12 @@ export default function UpdateTaskModal({
   taskId,
 }) {
   const [edits, setEdits] = useState({});
+  const { myRoleInProject, roleLoading } = useGetMyRoleInProject(
+    groupId,
+    projectId,
+  );
+  const isAdmin =
+    myRoleInProject?.role === "admin" || myRoleInProject?.role === "groupAdmin";
 
   const { taskUpdateMutation, isPending } = useUpdateTask(setIsOpen);
   const { taskByIdData } = useGetTaskById(groupId, projectId, taskId);
@@ -63,6 +69,14 @@ export default function UpdateTaskModal({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (
+      !isAdmin ||
+      !assignedTo.find(
+        (member) =>
+          member._id.toString() === myRoleInProject?.userId.toString(),
+      )
+    )
+      return toast.error("You are not authorized to update this task");
     if (!name || !dueDate || !status || !priority || assignedTo.length === 0) {
       return;
     }

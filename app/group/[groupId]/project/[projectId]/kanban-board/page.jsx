@@ -5,12 +5,21 @@ import { useParams } from "next/navigation";
 import useGetTask from "@/hooks/useGetTask";
 import { axiosInstance } from "@/lib/axios";
 import CreateTaskModal from "@/components/CreateTaskModal";
+import useGetMyRoleInProject from "@/hooks/useGetMyRoleInProject";
+import toast from "react-hot-toast";
+import { Trash2 } from "lucide-react";
 
 const COLUMN_ORDER = ["todo", "in-progress", "completed"];
 
 const KanbanBoard = () => {
   const { groupId, projectId } = useParams();
   const [isOpen, setIsOpen] = useState(false);
+  const { myRoleInProject, roleLoading } = useGetMyRoleInProject(
+    groupId,
+    projectId,
+  );
+  const isAdmin =
+    myRoleInProject?.role === "admin" || myRoleInProject?.role === "groupAdmin";
 
   const {
     taskData = [],
@@ -49,6 +58,14 @@ const KanbanBoard = () => {
 
   const handleDrop = async (e, newStatus) => {
     e.preventDefault();
+    const isAssigned = draggedTask.assignedTo.some(
+      (member) => member._id.toString() === myRoleInProject?.userId?.toString(),
+    );
+
+    if (!isAdmin && !isAssigned) {
+      return toast.error("You are not authorized to update this task");
+    }
+
     if (!draggedTask || draggedTask.status === newStatus) return;
 
     await axiosInstance.patch(
@@ -61,10 +78,19 @@ const KanbanBoard = () => {
   };
 
   /* ---------------- DELETE TASK ---------------- */
-  const removeTask = async (taskId) => {
-    await axiosInstance.delete(
-      `/group/${groupId}/project/${projectId}/task/${taskId}`,
+  const removeTask = async (task) => {
+    const isAssigned = task.assignedTo.some(
+      (member) => member._id.toString() === myRoleInProject?.userId?.toString(),
     );
+
+    if (!isAdmin && !isAssigned) {
+      return toast.error("You are not authorized to delete this task");
+    }
+
+    await axiosInstance.delete(
+      `/group/${groupId}/project/${projectId}/task/${task._id}`,
+    );
+    toast.success("Task deleted successfully");
     refetch();
   };
 
@@ -194,30 +220,48 @@ const KanbanBoard = () => {
                   </p>
                 </div>
               ) : (
-                columns[columnId].items.map((task) => (
-                  <div
-                    key={task._id}
-                    draggable
-                    onDragStart={() => handleDragStart(task)}
-                    className={`group flex items-center justify-between p-3.5 mb-2.5 bg-white border border-gray-200 ${columnStyles[columnId].cardHover} rounded-lg shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div
-                        className={`w-2 h-2 rounded-full ${columnStyles[columnId].dot}`}
-                      />
-                      <span className="text-gray-700 text-sm font-medium truncate">
-                        {task.name}
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={() => removeTask(task._id)}
-                      className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-400 transition p-1 rounded hover:bg-red-50"
+                columns[columnId].items.map((task) => {
+                  console.log(task);
+                  return (
+                    <div
+                      key={task._id}
+                      draggable
+                      onDragStart={() => handleDragStart(task)}
+                      className={`group flex items-center justify-between p-3.5 mb-2.5 bg-white border border-gray-200 ${columnStyles[columnId].cardHover} rounded-lg shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all`}
                     >
-                      ✕
-                    </button>
-                  </div>
-                ))
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div
+                          className={`w-2 h-2 rounded-full ${columnStyles[columnId].dot}`}
+                        />
+                        <span className="text-gray-700 text-sm font-medium truncate">
+                          {task.name}
+                        </span>
+
+                        {/* Profile Images */}
+                        {task.assignedTo && task.assignedTo.length > 0 && (
+                          <div className="flex -space-x-2">
+                            {task.assignedTo.map((person, index) => (
+                              <img
+                                key={index}
+                                src={person.profileImage}
+                                alt={person.name || "Assigned user"}
+                                className="w-6 h-6 rounded-full border-2 border-white object-cover"
+                                title={person.name}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => removeTask(task)}
+                        className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-400 transition p-1 rounded hover:bg-red-50"
+                      >
+                        <Trash2 />
+                      </button>
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>

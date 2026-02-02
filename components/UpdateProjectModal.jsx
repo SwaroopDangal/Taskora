@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/select";
 import useUpdateProject from "@/hooks/useUpdateProject";
 import useGetProjectById from "@/hooks/useGetProjectById";
+import useGetMyRoleInProject from "@/hooks/useGetMyRoleInProject";
+import toast from "react-hot-toast";
 
 export default function UpdateProjectModal({
   isOpen,
@@ -28,6 +30,12 @@ export default function UpdateProjectModal({
   groupId,
   projectId,
 }) {
+  const { myRoleInProject, roleLoading } = useGetMyRoleInProject(
+    groupId,
+    projectId,
+  );
+  const isAdmin =
+    myRoleInProject?.role === "admin" || myRoleInProject?.role === "groupAdmin";
   const [edits, setEdits] = useState({});
 
   const { projectUpdateMutation, updatePending } = useUpdateProject(setIsOpen);
@@ -39,6 +47,7 @@ export default function UpdateProjectModal({
   const priority = edits.priority ?? projectByIdData?.priority ?? "";
 
   const handleSubmit = async (e) => {
+    if (!isAdmin) return toast.error("You are not an admin of this project");
     e.preventDefault();
 
     const payload = {
@@ -54,7 +63,7 @@ export default function UpdateProjectModal({
     projectUpdateMutation(payload);
   };
 
-  const isFormValid = name && description && dueDate && status && priority;
+  const isFormValid = name && dueDate && status && priority;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

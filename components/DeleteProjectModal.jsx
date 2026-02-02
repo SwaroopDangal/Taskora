@@ -1,15 +1,24 @@
 import useDeleteProject from "@/hooks/useDeleteProject";
+import useGetMyRoleInProject from "@/hooks/useGetMyRoleInProject";
 import { Trash2, X, AlertTriangle } from "lucide-react";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 const DeleteProjectModal = ({ isOpen, setIsOpen, groupId, projectId }) => {
   const { deleteProjectMutation, isPending } = useDeleteProject(
     groupId,
     projectId,
   );
+  const { myRoleInProject, roleLoading } = useGetMyRoleInProject(
+    groupId,
+    projectId,
+  );
+  const isAdmin =
+    myRoleInProject?.role === "admin" || myRoleInProject?.role === "groupAdmin";
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const handleDeleteTask = () => {
+    if (!isAdmin) return toast.error("You are not an admin of this project");
     if (deleteConfirmText === "confirm") {
       deleteProjectMutation();
       setIsOpen(false);

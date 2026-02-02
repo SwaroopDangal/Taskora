@@ -11,6 +11,7 @@ const DeleteTaskModal = ({ isOpen, setIsOpen, taskId, groupId, projectId }) => {
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
   const handleDeleteTask = () => {
+    
     if (deleteConfirmText === "confirm") {
       deleteTaskMutation();
       setIsOpen(false);

@@ -43,6 +43,8 @@ import useGetProjectById from "@/hooks/useGetProjectById";
 import Loading from "@/components/Loader";
 import useGetTask from "@/hooks/useGetTask";
 import TaskActions from "@/components/TaskActions";
+import useGetMyRoleInGroup from "@/hooks/useGetMyRoleInGroup";
+import useGetMyRoleInProject from "@/hooks/useGetMyRoleInProject";
 
 export default function ProjectDetailPage() {
   const router = useRouter();
@@ -60,11 +62,20 @@ export default function ProjectDetailPage() {
   const { projectByIdData, isLoading } = useGetProjectById(groupId, projectId);
   const { taskData, taskLoading } = useGetTask(groupId, projectId);
 
+  const { myRoleInProject, roleLoading } = useGetMyRoleInProject(
+    groupId,
+    projectId,
+  );
+  console.log(myRoleInProject);
+  const isAdmin =
+    myRoleInProject?.role === "admin" || myRoleInProject?.role === "groupAdmin";
+
   let tasks = [];
   taskData?.map((task) => {
     const assignedTo = task.assignedTo.map((member) => ({
       name: member.name,
       avatar: member.profileImage,
+      _id: member._id,
     }));
     const payload = {
       id: task?._id,
@@ -470,7 +481,7 @@ export default function ProjectDetailPage() {
                       const statusConfig = getStatusConfig(task.status);
                       const priorityConfig = getPriorityConfig(task.priority);
                       const dateInfo = formatDate(task.dueDate);
-                      console.log(dateInfo);
+                      console.log(task);
                       const StatusIcon = statusConfig.icon;
 
                       return (
@@ -613,13 +624,20 @@ export default function ProjectDetailPage() {
                           </td>
 
                           {/* Actions */}
-                          <td className="py-4 px-6 relative overflow-visible text-right">
-                            <TaskActions
-                              taskId={task.id}
-                              groupId={groupId}
-                              projectId={projectId}
-                            />
-                          </td>
+                          {isAdmin ||
+                          task.assignedTo.find(
+                            (member) =>
+                              member._id.toString() ===
+                              myRoleInProject?.userId.toString(),
+                          ) ? (
+                            <td className="py-4 px-6 relative overflow-visible text-right">
+                              <TaskActions
+                                taskId={task.id}
+                                groupId={groupId}
+                                projectId={projectId}
+                              />
+                            </td>
+                          ) : null}
                         </tr>
                       );
                     })}
@@ -840,7 +858,10 @@ export default function ProjectDetailPage() {
                 <p className="text-sm sm:text-base text-slate-600 mb-6">
                   Get started by creating your first task for this project
                 </p>
-                <Button className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm sm:text-base px-6 py-5 sm:py-6 shadow-lg w-full sm:w-auto">
+                <Button
+                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm sm:text-base px-6 py-5 sm:py-6 shadow-lg w-full sm:w-auto"
+                  onClick={() => setIsOpen(true)}
+                >
                   <Plus className="h-5 w-5 mr-2" />
                   Create first task
                 </Button>
