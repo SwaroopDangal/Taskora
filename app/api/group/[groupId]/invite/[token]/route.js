@@ -35,6 +35,11 @@ export const GET = async (req, { params }) => {
                 { status: 404 }
             );
         }
+        if (group.groupType === "personal")
+            return NextResponse.json(
+                { message: "You cannot enter into a personal group" },
+                { status: 403 }
+            );
 
         const existingMember = await Group.findOne({
             _id: invite.groupId,

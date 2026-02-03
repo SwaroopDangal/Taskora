@@ -32,6 +32,12 @@ export const POST = async (request, { params }) => {
             return NextResponse.json(
                 { message: "Group not found" }, { status: 404 });
         }
+        if (group.members.find(m => m.user.toString() === user._id.toString()))
+            return NextResponse.json(
+                { message: "You are not a member of this group" },
+                { status: 403 }
+            );
+
         const project = await Project.create({
             name,
             description,
@@ -62,12 +68,23 @@ export const GET = async (request, { params }) => {
     if (error) return error;
     try {
         await connectDB();
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return NextResponse.json(
+                { message: "Group not found" }, { status: 404 });
+        }
+        if (group.members.find(m => m.user.toString() === user._id.toString()))
+            return NextResponse.json(
+                { message: "You are not a member of this group" },
+                { status: 403 }
+            );
         const projects = await Project.find({
             group: groupId,
         }).populate("admin", "_id name email profileImage")
             .populate("group", "_id name description imageUrl groupType")
             .populate("tasks", "_id name description status dueDate priority")
             .lean();
+
         return NextResponse.json(projects, { status: 200 })
     } catch (error) {
         console.log(error);
