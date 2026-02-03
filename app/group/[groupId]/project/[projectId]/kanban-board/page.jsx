@@ -68,8 +68,10 @@ const KanbanBoard = () => {
     const isAssigned = draggedTask.assignedTo.some(
       (member) => member._id.toString() === myRoleInProject?.userId?.toString(),
     );
+    const isCreator =
+      draggedTask.createdBy.toString() === myRoleInProject?.userId?.toString();
 
-    if (!isAdmin && !isAssigned) {
+    if (!isAdmin && !isAssigned && !isCreator) {
       return toast.error("You are not authorized to update this task");
     }
 
@@ -89,8 +91,10 @@ const KanbanBoard = () => {
     const isAssigned = task.assignedTo.some(
       (member) => member._id.toString() === myRoleInProject?.userId?.toString(),
     );
+    const isCreator =
+      task.createdBy.toString() === myRoleInProject?.userId?.toString();
 
-    if (!isAdmin && !isAssigned) {
+    if (!isAdmin && !isAssigned && !isCreator) {
       return toast.error("You are not authorized to delete this task");
     }
 

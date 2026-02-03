@@ -481,6 +481,14 @@ export default function ProjectDetailPage() {
                         const dateInfo = formatDate(task.dueDate);
                         console.log(task);
                         const StatusIcon = statusConfig.icon;
+                        const isCreator =
+                          task.createdBy.toString() ===
+                          myRoleInProject?.userId.toString();
+                        const isAssigned = task.assignedTo.some(
+                          (member) =>
+                            member._id.toString() ===
+                            myRoleInProject?.userId.toString(),
+                        );
 
                         return (
                           <tr
@@ -624,12 +632,7 @@ export default function ProjectDetailPage() {
                             </td>
 
                             {/* Actions */}
-                            {isAdmin ||
-                            task.assignedTo.find(
-                              (member) =>
-                                member._id.toString() ===
-                                myRoleInProject?.userId.toString(),
-                            ) ? (
+                            {isAdmin || isCreator || isAssigned ? (
                               <td className="py-4 px-6 relative overflow-visible text-right">
                                 <TaskActions
                                   taskId={task.id}

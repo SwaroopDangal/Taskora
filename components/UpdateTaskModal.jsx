@@ -69,13 +69,12 @@ export default function UpdateTaskModal({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !isAdmin ||
-      !assignedTo.find(
-        (member) =>
-          member._id.toString() === myRoleInProject?.userId.toString(),
-      )
-    )
+    const isCreator =
+      taskByIdData?.createdBy.toString() === myRoleInProject?.userId.toString();
+    const isAssigned = taskByIdData?.assignedTo.some(
+      (member) => member._id.toString() === myRoleInProject?.userId.toString(),
+    );
+    if (!isAdmin || !isCreator || !isAssigned)
       return toast.error("You are not authorized to update this task");
     if (!name || !dueDate || !status || !priority || assignedTo.length === 0) {
       return;
