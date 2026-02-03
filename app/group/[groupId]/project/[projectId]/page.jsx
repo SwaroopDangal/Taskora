@@ -50,6 +50,8 @@ export default function ProjectDetailPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredRow, setHoveredRow] = useState(null);
+  const [showActions, setShowActions] = useState(false);
+
   const tasksPerPage = 10;
 
   const { projectByIdData, isLoading } = useGetProjectById(groupId, projectId);
@@ -659,7 +661,7 @@ export default function ProjectDetailPage() {
 
               {/* Mobile Card View - Shown on small/medium screens */}
               <div className="lg:hidden space-y-4">
-                {tasks.map((task) => {
+                {sortedSearchedTasks.map((task) => {
                   const statusConfig = getStatusConfig(task.status);
                   const priorityConfig = getPriorityConfig(task.priority);
                   const dateInfo = formatDate(task.dueDate);
@@ -682,12 +684,9 @@ export default function ProjectDetailPage() {
                             </h3>
                           </div>
                           <p className="text-xs text-slate-500 ml-3">
-                            #{task.id}
+                            {task.description}
                           </p>
                         </div>
-                        <button className="w-8 h-8 rounded-lg hover:bg-emerald-50 flex items-center justify-center transition-colors flex-shrink-0">
-                          <MoreHorizontal className="w-5 h-5 text-slate-400" />
-                        </button>
                       </div>
 
                       {/* Status and Priority */}

@@ -30,7 +30,7 @@ export const GET = async (req, { params }) => {
         }
         if (group.groupType === "personal")
             return NextResponse.json(
-                { message: "You cannot invite members to a personal group" }, { status: 403 });
+                { message: "You cannot invite members to a personal group" }, { status: 200 });
 
 
         const invite = await GroupInvite.create({

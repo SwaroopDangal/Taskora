@@ -85,15 +85,15 @@ export default function CreateTaskModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold flex items-center gap-2">
-            <CheckSquare className="w-5 h-5 text-emerald-600" />
+          <DialogTitle className="text-lg sm:text-xl font-semibold flex items-center gap-2">
+            <CheckSquare className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
             Create New Task
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-5 py-4">
+        <div className="space-y-4 sm:space-y-5 py-3 sm:py-4">
           {/* Task Name */}
           <div className="space-y-2">
             <Label htmlFor="task-name">
@@ -138,7 +138,7 @@ export default function CreateTaskModal({
           </div>
 
           {/* Status & Priority - Two columns */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="status">
                 Status <span className="text-red-500">*</span>
@@ -218,7 +218,10 @@ export default function CreateTaskModal({
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-80 p-0" align="start">
+              <PopoverContent
+                className="w-[calc(100vw-2rem)] sm:w-80 p-0"
+                align="start"
+              >
                 <div className="max-h-64 overflow-y-auto p-2">
                   {members.map((member) => {
                     const isSelected = assignedTo.includes(member.id);
@@ -291,12 +294,12 @@ export default function CreateTaskModal({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-3 sm:pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => setIsOpen(false)}
-              className="flex-1"
+              className="flex-1 w-full"
               disabled={isPending}
             >
               Cancel
@@ -306,7 +309,7 @@ export default function CreateTaskModal({
               type="button"
               onClick={handleSubmit}
               disabled={isPending || !isFormValid}
-              className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
+              className="flex-1 w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700"
             >
               {isPending ? (
                 <>
