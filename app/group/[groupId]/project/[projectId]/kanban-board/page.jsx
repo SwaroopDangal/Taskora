@@ -12,6 +12,7 @@ import { useAuth } from "@clerk/nextjs";
 import Loading from "@/components/Loader";
 import ProtectRoute from "@/components/ProtectRoute";
 import useGetMyRoleInGroup from "@/hooks/useGetMyRoleInGroup";
+import useGetGroupById from "@/hooks/useGetGroupById";
 
 const COLUMN_ORDER = ["todo", "in-progress", "completed"];
 
@@ -19,6 +20,7 @@ const KanbanBoard = () => {
   const { groupId, projectId } = useParams();
   const [isOpen, setIsOpen] = useState(false);
   const { myRoleInGroup } = useGetMyRoleInGroup(groupId);
+  const { groupByIdData, isLoading: groupLoading } = useGetGroupById(groupId);
   const { myRoleInProject, roleLoading } = useGetMyRoleInProject(
     groupId,
     projectId,
@@ -250,19 +252,21 @@ const KanbanBoard = () => {
                           </span>
 
                           {/* Profile Images */}
-                          {task.assignedTo && task.assignedTo.length > 0 && (
-                            <div className="flex -space-x-2">
-                              {task.assignedTo.map((person, index) => (
-                                <img
-                                  key={index}
-                                  src={person.profileImage}
-                                  alt={person.name || "Assigned user"}
-                                  className="w-6 h-6 rounded-full border-2 border-white object-cover"
-                                  title={person.name}
-                                />
-                              ))}
-                            </div>
-                          )}
+                          {task.assignedTo &&
+                            task.assignedTo.length > 0 &&
+                            groupByIdData?.groupType !== "personal" && (
+                              <div className="flex -space-x-2">
+                                {task.assignedTo.map((person, index) => (
+                                  <img
+                                    key={index}
+                                    src={person.profileImage}
+                                    alt={person.name || "Assigned user"}
+                                    className="w-6 h-6 rounded-full border-2 border-white object-cover"
+                                    title={person.name}
+                                  />
+                                ))}
+                              </div>
+                            )}
                         </div>
 
                         <button

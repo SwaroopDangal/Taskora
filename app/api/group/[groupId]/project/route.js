@@ -32,7 +32,10 @@ export const POST = async (request, { params }) => {
             return NextResponse.json(
                 { message: "Group not found" }, { status: 404 });
         }
-        if (group.members.find(m => m.user.toString() === user._id.toString()))
+        const isMember = group.members.find(m => m.user.toString() === user._id.toString())
+        const isAdmin = group.members.find(m => m.role === "admin")
+        if (!isMember && !isAdmin)
+
             return NextResponse.json(
                 { message: "You are not a member of this group" },
                 { status: 403 }

@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useCreateProject from "@/hooks/useCreateProject";
+import useGetGroupById from "@/hooks/useGetGroupById";
 
 export default function CreateProjectModal({ isOpen, setIsOpen, groupId }) {
   const [name, setName] = useState("");
@@ -32,6 +33,7 @@ export default function CreateProjectModal({ isOpen, setIsOpen, groupId }) {
     setIsOpen,
     groupId,
   });
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

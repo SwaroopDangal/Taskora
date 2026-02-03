@@ -37,6 +37,7 @@ import TaskActions from "@/components/TaskActions";
 import useGetMyRoleInGroup from "@/hooks/useGetMyRoleInGroup";
 import useGetMyRoleInProject from "@/hooks/useGetMyRoleInProject";
 import ProtectRoute from "@/components/ProtectRoute";
+import useGetGroupById from "@/hooks/useGetGroupById";
 
 export default function ProjectDetailPage() {
   const router = useRouter();
@@ -53,6 +54,8 @@ export default function ProjectDetailPage() {
 
   const { projectByIdData, isLoading } = useGetProjectById(groupId, projectId);
   const { taskData, taskLoading } = useGetTask(groupId, projectId);
+
+  const { groupByIdData, isLoading: groupLoading } = useGetGroupById(groupId);
 
   const { myRoleInGroup, roleLoading: groupRoleLoading } =
     useGetMyRoleInGroup(groupId);
@@ -78,6 +81,7 @@ export default function ProjectDetailPage() {
       title: task?.name,
       status: task?.status,
       dueDate: task?.dueDate,
+      createdBy: task?.createdBy,
       priority: task?.priority,
       assignedTo,
     };
@@ -468,9 +472,11 @@ export default function ProjectDetailPage() {
                         <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">
                           Due Date
                         </th>
-                        <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">
-                          Assigned To
-                        </th>
+                        {groupByIdData?.groupType !== "personal" && (
+                          <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">
+                            Assigned To
+                          </th>
+                        )}
                         <th className="w-12"></th>
                       </tr>
                     </thead>
@@ -482,7 +488,7 @@ export default function ProjectDetailPage() {
                         console.log(task);
                         const StatusIcon = statusConfig.icon;
                         const isCreator =
-                          task.createdBy.toString() ===
+                          task?.createdBy.toString() ===
                           myRoleInProject?.userId.toString();
                         const isAssigned = task.assignedTo.some(
                           (member) =>
@@ -599,37 +605,39 @@ export default function ProjectDetailPage() {
                             </td>
 
                             {/* Assigned To */}
-                            <td className="py-4 px-6">
-                              <div className="flex items-center -space-x-2">
-                                {task.assignedTo.map((member, i) => (
-                                  <div
-                                    key={i}
-                                    className="relative group"
-                                    style={{
-                                      zIndex: task.assignedTo.length - i,
-                                    }}
-                                  >
-                                    <div className="w-9 h-9 rounded-full border-2 border-white bg-gradient-to-br from-emerald-400 to-teal-500 overflow-hidden shadow-md hover:scale-110 transition-transform cursor-pointer">
-                                      <img
-                                        src={member.avatar}
-                                        alt={member.name}
-                                        className="w-full h-full object-cover"
-                                      />
+                            {groupByIdData?.groupType !== "personal" && (
+                              <td className="py-4 px-6">
+                                <div className="flex items-center -space-x-2">
+                                  {task.assignedTo.map((member, i) => (
+                                    <div
+                                      key={i}
+                                      className="relative group"
+                                      style={{
+                                        zIndex: task.assignedTo.length - i,
+                                      }}
+                                    >
+                                      <div className="w-9 h-9 rounded-full border-2 border-white bg-gradient-to-br from-emerald-400 to-teal-500 overflow-hidden shadow-md hover:scale-110 transition-transform cursor-pointer">
+                                        <img
+                                          src={member.avatar}
+                                          alt={member.name}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                      {/* Tooltip */}
+                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
+                                        {member.name}
+                                        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 bg-slate-900 rotate-45"></div>
+                                      </div>
                                     </div>
-                                    {/* Tooltip */}
-                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
-                                      {member.name}
-                                      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 bg-slate-900 rotate-45"></div>
+                                  ))}
+                                  {task.assignedTo.length > 3 && (
+                                    <div className="w-9 h-9 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-xs font-semibold text-slate-600 shadow-md">
+                                      +{task.assignedTo.length - 3}
                                     </div>
-                                  </div>
-                                ))}
-                                {task.assignedTo.length > 3 && (
-                                  <div className="w-9 h-9 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-xs font-semibold text-slate-600 shadow-md">
-                                    +{task.assignedTo.length - 3}
-                                  </div>
-                                )}
-                              </div>
-                            </td>
+                                  )}
+                                </div>
+                              </td>
+                            )}
 
                             {/* Actions */}
                             {isAdmin || isCreator || isAssigned ? (

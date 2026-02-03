@@ -56,7 +56,6 @@ export default function CreateTaskModal({
     members.push(payload);
   });
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -81,10 +80,8 @@ export default function CreateTaskModal({
     setAssignedTo("");
   };
 
-  //   TODO: Add assignedto functionality
-
   const isFormValid =
-    name && assignedTo.length > 0 && dueDate && status && priority;
+    name && dueDate && status && priority && assignedTo.length > 0;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
